@@ -74,6 +74,8 @@ public class ChatApiController {
         }
         if(StrUtil.isNotEmpty(msg)){
             msg=msg.replace("poe"," ");
+            msg=msg.replace("perplexity"," ");
+            msg=msg.replace("Poe"," ");
             msg=msg.replace("..."," ");
             msg=msg.replace("Waiting...","");
             msg=msg.replace("GPT-4 did not respond.","");
@@ -81,7 +83,7 @@ public class ChatApiController {
         // 客户端只负责把id和内容上报，不做处理
         if(StrUtil.isNotEmpty(msgId)&&StrUtil.isNotEmpty(msg)){
             redisCacheService.set(msgId,msg);
-            //System.out.println("客户端上报："+msgId+" "+msg);
+            System.out.println("客户端上报："+msgId+" "+msg);
         }
 
         if(StrUtil.isNotEmpty(msgId)&&req.isAllTextFlag()){
