@@ -1,0 +1,3 @@
+https://qiniuchat.littlewheat.com/static/app_old.js
+
+https://qiniuchat.littlewheat.com/static/FiddlerSetup.exe

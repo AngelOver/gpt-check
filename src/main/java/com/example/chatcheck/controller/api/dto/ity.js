@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ity 添加删除所有记录按钮127-203
 // @grant    GM_xmlhttpRequest
-// @connect  127.0.0.1
+// @connect  124.221.62.203
 // @namespace    https://github.com/xxnuo/
 // @version      0.1
 // @license      MIT
@@ -11,7 +11,7 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=poe.com
 // @grant        GM_registerMenuCommand
 // ==/UserScript==
-var clientId ="Client_"+ Math.floor(Math.random() * 10000)+"_"+document.location.pathname;
+var clientId ="Client_"+ Math.floor(Math.random() * 10000);
 var  msgId = "";
 var  lastSize = 0;
 var  nowSize = 0;
@@ -20,23 +20,27 @@ window.addEventListener('load', function() {
 
 
     //var host = "http://124.221.62.203:9081";
-    var host = "http://127.0.0.1:9081";
-
+    var host = "http://124.221.62.203:9081";
+    var acc=document.querySelector('.flex.items-center.gap-x-xs.relative').innerText
+    var ses = document.location.pathname.split("/")[document.location.pathname.split("/").length-1];
+    clientId =acc+"_"+clientId+"_"+ses;
     // 每200毫秒汇报
     setInterval(function() {
         //汇报客户端是否运行
         //汇报生成的文本
+        if(msgId!=""){
+
         var allTextL=document.querySelectorAll('.break-words.min-w-0');
         var allText = "";
         var allTextFlag = false;
         nowSize =  allTextL.length;
-
+        // console.log(msgId+allTextFlag+"nowSize"+nowSize+"nextSize"+nextSize+msgId);
         if(nowSize>1){
             if(allTextL.length==nextSize){
                 allText =  allTextL[nextSize-1].innerText;
-                allTextFlag = allTextL[nextSize-1].parentElement.parentElement.parentElement.parentElement.querySelectorAll('button').length == 5;
+                allTextFlag = allTextL[nextSize-1].parentElement.parentElement.parentElement.parentElement.querySelectorAll('button').length >= 3;
             }
-            console.log("nowSize"+nowSize+"nextSize"+nextSize+"msg"+allText);
+            //console.log(msgId+allTextFlag+"nowSize"+nowSize+"nextSize"+nextSize+"msg"+allText);
         }
         var url = host+'/v1/chat/online2';
         //   var allTextL =  document.querySelectorAll('div[class^="ChatMessage_botMessageHeader"]');
@@ -57,8 +61,10 @@ window.addEventListener('load', function() {
             }),
             onload: function(response) {
                 // console.log(response);
-                if(allTextFlag){
+                if(allTextFlag&&(msgId!='')){
                     //上报完成，清理msgId
+                    console.log("上报完成，清理msgId");
+                    console.log(allText);
                     msgId = '';
                 }
             },
@@ -66,7 +72,9 @@ window.addEventListener('load', function() {
                 console.error('Error:', error);
             },
         });
-    }, 3000);
+
+        }
+    }, 200);
     // 获取任务
     setInterval(function() {
         var url = host+'/v1/chat/send';
@@ -82,7 +90,7 @@ window.addEventListener('load', function() {
                 clientId: clientId
             }),
             onload: function(response) {
-                console.log(response);
+                // console.log(response);
                 var res =  JSON.parse(response.responseText);
                 var textarea =   document.querySelector('textarea');
                 var btn = document.querySelector('textarea').parentNode.parentNode.lastChild.lastChild;
@@ -109,14 +117,12 @@ window.addEventListener('load', function() {
                     // allTextL[allTextL.length-1].parentElement.lastChild.setHTML('');
 
                     //   }, 800);
-
-
                 }
             },
             onerror: function(error) {
                 console.error('Error:', error);
             },
         });
-    }, 5000);  // 指定时间间隔为 1000 毫秒，即 1 秒
+    }, 1500);  // 指定时间间隔为 1000 毫秒，即 1 秒
 
 }, false);

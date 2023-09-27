@@ -1,4 +1,4 @@
-package com.example.chatcheck.controller;
+package com.example.chatcheck.controller.api;
 
 import cn.hutool.core.util.RandomUtil;
 import com.example.chatcheck.controller.api.dto.MsgUtil;

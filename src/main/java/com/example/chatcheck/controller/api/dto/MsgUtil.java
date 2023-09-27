@@ -6,14 +6,20 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.chatcheck.controller.api.MsgDTO;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 public class MsgUtil {
+
+    public static ConcurrentMap<String, MsgDTO> msgMap = new ConcurrentHashMap<>();
+
 
 
     static String[] msgList =new String[]{
@@ -68,9 +74,9 @@ public class MsgUtil {
         List<ChatMsg> chatMsgs = JSONArray.parseArray(msg, ChatMsg.class);
         ChatMsg chatMsgNow = chatMsgs.get(chatMsgs.size() - 1);
         String msgNow = chatMsgNow.getContent();
-        if(msgNow.length()>1500){
-            if(msgNow.length()>2000){
-                return  msgNow.substring(0,500)+"..." + msgNow.substring(msgNow.length()-1500,msgNow.length());
+        if(msgNow.length()>3000){
+            if(msgNow.length()>3500){
+                return  msgNow.substring(0,500)+"..." + msgNow.substring(msgNow.length()-3000,msgNow.length());
             }else {
                 return  chatMsgNow.getContent();
             }
@@ -89,7 +95,7 @@ public class MsgUtil {
         String history = "";
         if(chatMsgs.size()>1){
 
-            history  = "刚才我们聊到这里：";
+            history  = "刚刚我们聊到这：";
             history+= chatMsgs.subList(0, chatMsgs.size() - 1).stream().map(chatMsg -> {
                 return chatMsg.getPContent();
             }).reduce((a, b) -> a + " " + b).get();
@@ -100,8 +106,8 @@ public class MsgUtil {
         String message = history + chatMsgNow.getContent();
         message.replaceAll("&nbsp;","");
         message.replaceAll(" ","");
-        if(message.length()>2000){
-            message = message.substring(0,500)+"..." + message.substring(message.length()-1500,message.length());
+        if(message.length()>3500){
+            message = message.substring(0,500)+"..." + message.substring(message.length()-3000,message.length());
           //  message = message.substring(message.length()-2000,message.length());
         }
         return message;
@@ -119,8 +125,9 @@ public class MsgUtil {
             p3 = msg.substring(old.length());
 
         }catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("error old:"+old+" now:"+msg);
+           // e.printStackTrace();
+            System.out.println(e.getMessage());
+            //System.out.println("error old:"+old+" now:"+msg);
         }
 
         //chatcmpl-NAztrAjDKxEH28czkN4POQ4n4nGwT
@@ -131,8 +138,9 @@ public class MsgUtil {
 //        p3= p3.replaceAll("Copy","  ");
 //        p3= p3.replaceAll("\n\n","\n");
 //        p3= p3.replaceAll(" ","&nbsp");
-
+        //md格式必定错乱
         String t3= p3.replaceAll(" ","&nbsp;").replaceAll(" ","&nbsp;").replaceAll(" ","&nbsp;");
+       // t3 = p3;//md格式必定错乱
         JSONObject res = new JSONObject();
         res.put("id",p1);
         res.put("object","chat.completion.chunk");
@@ -210,8 +218,10 @@ public class MsgUtil {
              p3 = now.substring(last.length());
 
         }catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("error last:"+last+" now:"+now);
+            //  e.printStackTrace();
+            System.out.println(e.getMessage());
+
+           // System.out.println("error last:"+last+" now:"+now);
         }
         JSONObject res1 = new JSONObject();
         res1.put("last",last);
@@ -235,6 +245,29 @@ public class MsgUtil {
             p3= p3.replaceAll("\n"," ");
         }
         p3= p3.replaceAll("Copy","  ");
+
+        p3=p3.replace("poe"," ");
+        p3=p3.replace("perplexity"," ");
+        p3=p3.replace("Perplexity"," ");
+        p3=p3.replace("rate limit"," ");
+        p3=p3.replace("Poe"," ");
+        p3=p3.replace("..."," ");
+        p3=p3.replace("Waiting...","");
+        p3=p3.replace("GPT-4 did not respond.","");
+
+        p3= p3.replaceAll("\n1","")
+                .replaceAll("\n2","")
+                .replaceAll("\n3","")
+                .replaceAll("\n4","")
+                .replaceAll("\n5","")
+                .replaceAll("\n6","")
+                .replaceAll("\n7","")
+                .replaceAll("\n8","")
+                .replaceAll("\n9","")
+                .replaceAll("\n10","")
+                .replaceAll("\n\\.",".")
+                .replaceAll("\n。","。")
+        ;
         return p3;
     }
 
