@@ -22,7 +22,7 @@ public class FakeApi {
     //fake登录接口，获取token
     // token转api
 
-    static String login_url = "http://124.222.27.176:9049/auth/login";
+    static String login_url = "http://193.218.201.102:9049/auth/login";
     static String fk_url = "https://ai.fakeopen.com/token/register";
     static String pk_url = "https://ai.fakeopen.com/pool/update";
 

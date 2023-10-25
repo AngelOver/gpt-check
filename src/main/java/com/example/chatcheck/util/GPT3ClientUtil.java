@@ -3,6 +3,7 @@ package com.example.chatcheck.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.cron.CronUtil;
 import cn.hutool.cron.task.Task;
 import cn.hutool.http.Header;
@@ -68,6 +69,44 @@ public class GPT3ClientUtil {
         System.out.println(responseBody);
         return responseBody;
     }
+
+    public static String sendMsg(String host,String apiKey,String msg,String modelNum){
+        // 设置请求URL和参数
+        if(StrUtil.isEmpty(host)){
+            host = "http://chatapi2.a3r.top";
+        }
+        String url = host+"/v1/chat/completions";
+//        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 7890));
+        // 设置请求头部信息
+        HttpRequest request = HttpRequest.post(url)
+                .header(Header.AUTHORIZATION, "Bearer "+apiKey)
+                .header(Header.CONTENT_TYPE, "application/json");
+        // 设置请求体参数
+        String model = "3".equals(modelNum)?"gpt-3.5-turbo":"gpt-4";
+        String body = "{\"model\": \""+model+"\", \"messages\": [{\"role\": \"user\", \"content\": \""+msg+"\"}], \"stream\": false}";
+        request.body(body);
+
+        // 发送请求并获取响应
+        HttpResponse response = request.execute();
+        String responseBody = IoUtil.read(response.bodyStream(), "UTF-8");
+        // 打印响应结果
+        return responseBody;
+    }
+    public static String testM3(String host,String apiKey){
+        System.out.println(apiKey);
+        String ping = sendMsg(host, apiKey, "ping", "3");
+        System.out.println(ping);
+        return ping;
+    }
+
+    public static String testM4(String host,String apiKey){
+        System.out.println(apiKey);
+        String ping = sendMsg(host, apiKey, "鲁迅和周树人是同一个人吗，回答“是” 或者 “不是”，或者 “不清楚”，最多允许回复3个字", "4");
+        System.out.println(ping);
+        return ping;
+    }
+
+
 
 
     public static void main(String[] args) {

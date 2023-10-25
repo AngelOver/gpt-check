@@ -145,7 +145,7 @@ public class MsgUtil {
         res.put("id",p1);
         res.put("object","chat.completion.chunk");
         res.put("created",p2);
-        res.put("model","gpt-4.0");
+        res.put("model","Claude");
         JSONObject delta = new JSONObject();
         delta.put("content",t3);
         JSONObject choice = new JSONObject();
