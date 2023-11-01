@@ -2,16 +2,15 @@ package com.example.chatcheck.controller;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
+import com.alibaba.fastjson.JSONObject;
 import com.example.chatcheck.util.GPTPlusUtil;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 设备列表对外接口，对其他模块
@@ -90,14 +89,14 @@ public class ChatPlusController {
 
 
     @PostMapping("/chat3")
-    public void chat3(String msg, HttpServletResponse response) {
+    public void chat3(@RequestBody Object msg, HttpServletResponse response) {
         try {
             response.setContentType("text/event-stream;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
 
             final PrintWriter writer = response.getWriter();
 
-            GPTPlusUtil.sendMsg3(msg, new GPTPlusUtil.ResponseHandler() {
+            GPTPlusUtil.sendMsg3(JSONObject.toJSONString(msg), new GPTPlusUtil.ResponseHandler() {
                 @Override
                 public void handleLine(String line) {
                     writer.write("data: " + line + "\n\n");
@@ -116,6 +115,10 @@ public class ChatPlusController {
             });
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -123,11 +126,11 @@ public class ChatPlusController {
 
 
     @PostMapping("/chat4")
-    public void chat4(String msg, HttpServletResponse response) {
+    public void chat4(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException {
         response.setContentType("text/event-stream;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
+        new GPTPlusUtil().sendMsg4(JSONObject.toJSONString(msg), response);
 
-        GPTPlusUtil.sendMsg4(msg, response);
     }
 
 }
