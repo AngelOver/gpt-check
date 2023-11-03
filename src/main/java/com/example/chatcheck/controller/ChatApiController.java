@@ -171,31 +171,38 @@ public class ChatApiController {
         System.out.println(clientId+"客户端 执行任务 msgId:"+peek.key+"======");
         return peek.getClientMsg(); //下发问题
     }
+   static  final String gpt4 = " You are ChatGPT, a large language model trained by OpenAI.Knowledge cutoff: 2021-09,Current model: gpt-4";
 
     @PostMapping("/completions")
     public void chat4(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
-        response.setContentType("text/event-stream;charset=UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(msg));
-        JSONArray messages = jsonObject.getJSONArray("messages");
-        JSONArray newMsg = new JSONArray();
-        int index = 0;
-        for (Object message : messages) {
-            index = index+1;
-            if(index==1){
-                JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
-                if("system".equals(data.getString("role"))  ){
-                    data.put("content", data.getString("content")+
-                            " You are ChatGPT, a large language model trained by OpenAI.Knowledge cutoff: 2021-09,Current model: gpt-4"
-                    );
-                    newMsg.add(data);
-                    continue;
+        try {
+            response.setContentType("text/event-stream;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(msg));
+            JSONArray messages = jsonObject.getJSONArray("messages");
+            JSONArray newMsg = new JSONArray();
+            int index = 0;
+            for (Object message : messages) {
+                index = index+1;
+                if(index==1){
+                    JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
+                    if("system".equals(data.getString("role"))  ){
+                        data.put("content", data.getString("content")+gpt4 );
+                        newMsg.add(data);
+                        continue;
+                    }
                 }
+
+                newMsg.add(message);
             }
-            newMsg.add(message);
+            System.out.println(JSONObject.toJSONString(newMsg.get(newMsg.size()-1)));
+            jsonObject.put("messages", newMsg);
+            GPTPlusUtil.sendMsg4(JSONObject.toJSONString(jsonObject), response);
+        } catch (Exception e)
+        {
+            System.out.println("error"+e.getMessage());
+            response.getWriter().close();
         }
-        jsonObject.put("messages", newMsg);
-        GPTPlusUtil.sendMsg4(JSONObject.toJSONString(jsonObject), response);
     }
     /**
      * api接口

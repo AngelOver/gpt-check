@@ -183,7 +183,7 @@ public class GPTPlusUtil {
         //String url = "https://apic.littlewheat.com/v1/chat/completions";
         String url = "https://1api.onechat.fun/v1/chat/completions";
         //https://api.onechat.fun
-        System.out.println(msg);
+       // System.out.println(msg);
         // 创建AsyncHttpClient实例
         AsyncHttpClient client = new DefaultAsyncHttpClient();
 
@@ -232,12 +232,15 @@ public class GPTPlusUtil {
                         int length =  split.length;
                         if(length>2){
                             for (int i = 1; i < length; i++) {
-                                String msg = split[i];
+                                String msg = "data:"+split[i];
                                 //  System.out.println("02");
                                 //System.out.println("data:"+msg);
-                                writer.write("data:"+msg);
+                                writer.write(msg);
                                 writer.flush();
+                                msg = null;
                             }
+                            split = null;
+                            s=null;
                             return State.CONTINUE;
                         }
                     }
@@ -247,18 +250,22 @@ public class GPTPlusUtil {
                     int length =  split.length;
                     if(length>2){
                         for (int i = 1; i < length; i++) {
-                            String msg = split[i];
+                            String msg = "data:"+split[i];
                             //  System.out.println("02");
                             //System.out.println("data:"+msg);
-                            writer.write("data:"+msg);
+                            writer.write(msg);
                             writer.flush();
+                            msg = null;
                         }
+                        split = null;
+                        s=null;
                         return State.CONTINUE;
                     }
                 }
                // System.out.println(new String(bodyPart.getBodyPartBytes(), StandardCharsets.UTF_8));
                 writer.write(s);
                 writer.flush();
+                s=null;
 //                if(new String(bodyPart.getBodyPartBytes()).contains("[DONE]")){
 //                    response.getWriter().close();
 //                }

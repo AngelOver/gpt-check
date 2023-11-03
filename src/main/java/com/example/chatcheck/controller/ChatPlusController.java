@@ -149,7 +149,7 @@ public class ChatPlusController {
             newMsg.add(message);
         }
         jsonObject.put("messages", newMsg);
-        new GPTPlusUtil().sendMsg4(JSONObject.toJSONString(jsonObject), response);
+        //new GPTPlusUtil().sendMsg4(JSONObject.toJSONString(jsonObject), response);
     }
 
 }
