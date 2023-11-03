@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -171,13 +172,37 @@ public class ChatApiController {
         return peek.getClientMsg(); //下发问题
     }
 
-
+    @PostMapping("/completions")
+    public void chat4(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
+        response.setContentType("text/event-stream;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(msg));
+        JSONArray messages = jsonObject.getJSONArray("messages");
+        JSONArray newMsg = new JSONArray();
+        int index = 0;
+        for (Object message : messages) {
+            index = index+1;
+            if(index==1){
+                JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
+                if("system".equals(data.getString("role"))  ){
+                    data.put("content", data.getString("content")+
+                            " You are ChatGPT, a large language model trained by OpenAI.Knowledge cutoff: 2021-09,Current model: gpt-4"
+                    );
+                    newMsg.add(data);
+                    continue;
+                }
+            }
+            newMsg.add(message);
+        }
+        jsonObject.put("messages", newMsg);
+        GPTPlusUtil.sendMsg4(JSONObject.toJSONString(jsonObject), response);
+    }
     /**
      * api接口
      * @param param
      * @return
      */
-    @PostMapping("/completions")
+    @PostMapping("/completions2")
     public void chat(@RequestBody JSONObject param,HttpServletResponse response ) {
         response.setContentType("text/event-stream;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");

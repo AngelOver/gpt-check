@@ -177,12 +177,13 @@ public class GPTPlusUtil {
             }
         }).toCompletableFuture().get();
     }
-    public  void sendMsg4(String msg, HttpServletResponse response) throws ExecutionException, InterruptedException {
+    public static void sendMsg4(String msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
+        PrintWriter writer = response.getWriter();
         // 设置请求URL和参数
         //String url = "https://apic.littlewheat.com/v1/chat/completions";
-        String url = "https://api.onechat.fun/v1/chat/completions";
+        String url = "https://1api.onechat.fun/v1/chat/completions";
         //https://api.onechat.fun
-
+        System.out.println(msg);
         // 创建AsyncHttpClient实例
         AsyncHttpClient client = new DefaultAsyncHttpClient();
 
@@ -190,7 +191,10 @@ public class GPTPlusUtil {
         Request request = new RequestBuilder("POST")
                 .setUrl(url)
               //  .setProxyServer(proxy)
-                .addHeader("authorization",authorization)
+                .addHeader(Header.AUTHORIZATION.name(),authorization)
+                .addHeader(Header.CONTENT_TYPE.name(),"application/json")
+                .setReadTimeout(360000)
+                .setRequestTimeout(360000)
 //                .addHeader("cookie",cookie)
 //                .addHeader("content-type","application/json")
 //                .addHeader("origin","https://chat.openai.com")
@@ -200,7 +204,9 @@ public class GPTPlusUtil {
 
         // 发送请求并获取响应
         client.executeRequest(request, new AsyncHandler<Void>() {
-            private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+           // private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+            private  int index = 0;
 
             @Override
             public State onStatusReceived(HttpResponseStatus status) throws Exception {
@@ -216,10 +222,43 @@ public class GPTPlusUtil {
 
             @Override
             public State onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
-
-                bytes.write(bodyPart.getBodyPartBytes());
-                response.getWriter().write(new String(bodyPart.getBodyPartBytes(), StandardCharsets.UTF_8));
-                response.getWriter().flush();
+                //bytes.write(bodyPart.getBodyPartBytes());
+                //System.out.println("01");
+                String s = new String(bodyPart.getBodyPartBytes(), StandardCharsets.UTF_8);
+                if(index==0){
+                    index =1;
+                    if(s.contains("data:")){
+                        String[] split = s.split("data:");
+                        int length =  split.length;
+                        if(length>2){
+                            for (int i = 1; i < length; i++) {
+                                String msg = split[i];
+                                //  System.out.println("02");
+                                //System.out.println("data:"+msg);
+                                writer.write("data:"+msg);
+                                writer.flush();
+                            }
+                            return State.CONTINUE;
+                        }
+                    }
+                }
+                if(s.contains("[DONE]")){
+                    String[] split = s.split("data:");
+                    int length =  split.length;
+                    if(length>2){
+                        for (int i = 1; i < length; i++) {
+                            String msg = split[i];
+                            //  System.out.println("02");
+                            //System.out.println("data:"+msg);
+                            writer.write("data:"+msg);
+                            writer.flush();
+                        }
+                        return State.CONTINUE;
+                    }
+                }
+               // System.out.println(new String(bodyPart.getBodyPartBytes(), StandardCharsets.UTF_8));
+                writer.write(s);
+                writer.flush();
 //                if(new String(bodyPart.getBodyPartBytes()).contains("[DONE]")){
 //                    response.getWriter().close();
 //                }
@@ -231,7 +270,7 @@ public class GPTPlusUtil {
 //                response.getOutputStream().write(bytes.toByteArray());
 //                response.getOutputStream().flush();
                // response.getOutputStream().close();
-                response.getWriter().close();
+                writer.close();
                 return null;
             }
 
@@ -241,6 +280,8 @@ public class GPTPlusUtil {
             }
         }).toCompletableFuture().get();;
     }
+
+
 
 
 }

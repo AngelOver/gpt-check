@@ -2,6 +2,7 @@ package com.example.chatcheck.controller;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.chatcheck.util.GPTPlusUtil;
 import org.springframework.web.bind.annotation.*;
@@ -126,11 +127,29 @@ public class ChatPlusController {
 
 
     @PostMapping("/chat4")
-    public void chat4(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException {
+    public void chat4(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         response.setContentType("text/event-stream;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-        new GPTPlusUtil().sendMsg4(JSONObject.toJSONString(msg), response);
+        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(msg));
+        JSONArray messages = jsonObject.getJSONArray("messages");
+        JSONArray newMsg = new JSONArray();
+        int index = 0;
+        for (Object message : messages) {
+            index = index+1;
+            if(index==1){
+                JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
+                if("system".equals(data.getString("role"))  ){
+                    data.put("content", data.getString("content")+ " You are ChatGPT, a large language model trained by OpenAI.Knowledge cutoff: 2021-09,Current model: gpt-4"
+                    );
+                    newMsg.add(data);
+                    continue;
+                }
 
+            }
+            newMsg.add(message);
+        }
+        jsonObject.put("messages", newMsg);
+        new GPTPlusUtil().sendMsg4(JSONObject.toJSONString(jsonObject), response);
     }
 
 }
