@@ -181,7 +181,7 @@ public class GPTPlusUtil {
         PrintWriter writer = response.getWriter();
         // 设置请求URL和参数
         //String url = "https://apic.littlewheat.com/v1/chat/completions";
-        String url = "https://1api.onechat.fun/v1/chat/completions";
+        String url = "https://api.onechat.fun/v1/chat/completions";
         //https://api.onechat.fun
        // System.out.println(msg);
         // 创建AsyncHttpClient实例
