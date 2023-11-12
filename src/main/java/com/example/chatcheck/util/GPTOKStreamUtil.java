@@ -120,10 +120,10 @@ public class GPTOKStreamUtil {
         // String url1106 = "http://172.17.0.1:9092/v1/chat/completions";
         String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
         if(isN){
+            System.out.println("1106");
             obj.put("model","gpt-4-1106-preview");
-
             String msg = JSONObject.toJSONString(obj);
-            System.out.printf(msg);
+         //   System.out.printf(msg);
             return send(msg);
         }else {
             System.out.println("no1106");
