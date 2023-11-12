@@ -208,7 +208,7 @@ public class ChatApiController {
 
                 newMsg.add(message);
             }
-            System.out.println(JSONObject.toJSONString(newMsg.get(newMsg.size()-1)));
+            System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(newMsg.get(newMsg.size()-1)));
             jsonObject.put("messages", newMsg);
             GPTPlusUtil.sendMsg4Nine(isN1106All?true:isN1106,JSONObject.toJSONString(jsonObject), response);
         } catch (Exception e)
