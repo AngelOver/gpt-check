@@ -12,7 +12,9 @@ import com.example.chatcheck.controller.dto.ChatMsg;
 import com.example.chatcheck.controller.dto.MsgApiOnlineDTO;
 import com.example.chatcheck.controller.dto.MsgUtil;
 import com.example.chatcheck.controller.dto.R;
+import com.example.chatcheck.util.GPTOKStreamUtil;
 import com.example.chatcheck.util.GPTPlusUtil;
+import com.example.chatcheck.util.stream.SseStreamListener;
 import io.github.furstenheim.CopyDown;
 import io.github.furstenheim.Options;
 import io.github.furstenheim.OptionsBuilder;
@@ -20,6 +22,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +30,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutionException;
@@ -173,7 +177,7 @@ public class ChatApiController {
     }
    static  final String gpt4 = " You are ChatGPT, a large language model trained by OpenAI. Current model: gpt-4";
 
-    @PostMapping("/completions")
+    @PostMapping("/completions_old")
     public void chat4(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         try {
             response.setContentType("text/event-stream;charset=UTF-8");
@@ -210,7 +214,8 @@ public class ChatApiController {
             }
             System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(newMsg.get(newMsg.size()-1)));
             jsonObject.put("messages", newMsg);
-            GPTPlusUtil.sendMsg4Nine(isN1106All?true:isN1106,JSONObject.toJSONString(jsonObject), response);
+            boolean isN = isN1106All ? true : isN1106;
+            GPTPlusUtil.sendMsg4Nine(isN,jsonObject, response);
         } catch (Exception e)
         {
 
@@ -218,6 +223,91 @@ public class ChatApiController {
             response.getWriter().close();
         }
     }
+
+    @PostMapping("/completions")
+    public SseEmitter see2(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
+        try {
+            response.setContentType("text/event-stream;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+           // TimeInterval timer = DateUtil.timer();
+            JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(msg));
+            JSONArray messages = jsonObject.getJSONArray("messages");
+            JSONArray newMsg = new JSONArray();
+            boolean isN1106 = true;//仅仅当模型文字小于500token，并最后一行小于500
+            boolean isN1106All = false;//当出现gpt时，一定调用1106
+            int index = 0;
+            System.out.println(messages.size());
+            if(messages.size()>6){
+                System.out.println("超长限制");
+                JSONArray newMsgs = new JSONArray();
+                newMsgs.add(messages.get(0));
+                newMsgs.addAll(messages.subList(messages.size()-5,messages.size()));
+                messages = newMsgs;
+            }
+            for (Object message : messages) {
+                index = index+1;
+                JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
+                if(index==1){
+
+                    if("system".equals(data.getString("role"))  ){
+                        data.put("content", data.getString("content")+gpt4 );
+                        newMsg.add(data);
+                        continue;
+                    }
+                }
+                String content = data.getString("content");
+                if(content.contains("gpt")||content.contains("GPT")||content.contains("知识库")||content.contains("2023")){
+                    isN1106All=true;
+                }else{
+                    int length =  content.length();
+                    if(length>350){
+                        isN1106 = false;
+                    }
+                }
+
+                newMsg.add(message);
+            }
+            System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(newMsg.get(newMsg.size()-1)));
+            jsonObject.put("messages", newMsg);
+           // System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
+            boolean isN = isN1106All ? true : isN1106;
+            return GPTOKStreamUtil.sendMsg4Nine(isN,jsonObject, response);
+        } catch (Exception e)
+        {
+
+            System.out.println("error"+e.getMessage());
+            response.getWriter().close();
+        }
+        return null;
+    }
+
+//    @GetMapping("/sse")
+//    @CrossOrigin
+//    public SseEmitter sseEmitter(String prompt, HttpServletResponse response) {
+//        //国内需要代理 国外不需要
+//
+//        ChatGPTStream chatGPTStream = ChatGPTStream.builder()
+//                .timeout(600)
+//                .apiKey("sk-tNsj6ZGuhcNzfy9q235a71C80c044aAaB4F25a69C6F971E3")
+//                .apiHost("https://one-api.bltcy.top/")
+//                .build()
+//                .init();
+//
+//        SseEmitter sseEmitter = new SseEmitter(-1L);
+//
+//        SseStreamListener listener = new SseStreamListener(sseEmitter);
+//        Message message = Message.of(prompt);
+//
+//        listener.setOnComplate(msg -> {
+//            //回答完成，可以做一些事情
+//            //回答完毕后关闭 SseEmitter
+//            System.out.println("001");
+//            sseEmitter.complete(); // 关闭 SseEmitter
+//        });
+//        chatGPTStream.streamChatCompletion(Arrays.asList(message), listener);
+//
+//        return sseEmitter;
+//    }
     /**
      * api接口
      * @param param

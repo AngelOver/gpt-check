@@ -10,6 +10,7 @@ import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.asynchttpclient.*;
@@ -30,7 +31,8 @@ public class GPTPlusUtil {
     static String cookie = "__cf_bm=Ek481MNOM6hYDOBcfCOLqv45qhETK6ByhARw5YWQd7w-1681664435-0-ARhAdVlBk+4EgOU3UHSS2Aax/IEoswhn5Xw3uJRAMyTmAze0wivScVyo9NKLYtTKDzT7TtBxN9HUpVJaIh7cq/VvcB4l/Fb+17X62p59LNtCFXWMrkLmvsiQhPKS2vF32QCDZRo5YIAdHXtxKc1nRNJKg5rpqdHob9b8aNk6zaEl; _cfuvid=Z7zqfbu.RkQhnsSDzrgkM6B__.oVXm2VSnp0G2_Dce4-1681664432735-0-604800000; cf_clearance=Vj.zIH735GUI5PZv_IBWxhU6S42fcowUNztYrb79sBc-1681664426-0-1-fa1a5b65.9e90501b.ad1b0485-250; __Host-next-auth.csrf-token=b06b812507eb6af84bc31c9192ce899c7f8553e85adc78146f66c3a30c0ffd24%7C97b9b460ba93820a847d9ce951a60172d04c79ccedf1362e34a65d3d09ad9df5; __Secure-next-auth.callback-url=https%3A%2F%2Fchat.openai.com%2F; __Secure-next-auth.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..s0JYHw0SFtAgTZtI.S-Pg-rRpjR5ncP3RKRJZXv8xdwrTd6jwp6V9luRj712joOlD9rIshA6L-bI8xyXpBJQ5xa13XqaK_jT7N_vXaNkKpQUTDzOgL36RUTrIkjllYSsi1h6NCeyQPxbdZiGe8lVMkB6lFwf6ORcb6zhVuWjVk2PxIC-SiznRoedSrFatqWYIgiHZqdobDHKIsX-Z93H5zl_E4FZSH2JyRztSEXF_51NLGVMmUZf2t0qz1l7JLjAt0PmvkOK4OkBLty6Du60ZrA9zDA9qSpBwXDwXHtwfcQGFcRMfNkyE5AmMa7hnMKrnRQLTb53zJPbipg5NY8xmB97phYV2JLNh6C9iffBYijQJjWEHUmbXFerykgQ5JY6Qd-MszngkURom-Wi_AmOCbVw84Fi2fFdx_iYjmkUCs-KAZ49XT8NPPvGBvjD4BCm3Qpunmt8ElLDByMrCXOqHv0yyMhhqcq52HZIaxK-7BqqvsBQLFyuVII6WMyDeMexbFtSfYN8e_stb28PSu8AE0HBDMWslvL8Ab1WrUK1vvZCGt4cyOSaYFAiphP5dMy8oY2vuP9cQ-5CCZ6D7llRM68cevfzQElHyt2JN8MoaeXHq6n8FMS2Z06n5i31FxJLAtpX2S5xdQyILgCJoLy9CFb0dzUXrxFfsWP4QerRM5VDozbIjVoNrbki1BhQvajFYCD9i65ALEz-0OkmEJTiYrU_nRsAe16ut13JLyIBj50sO4oFhAIOwJoLH88zEKD4adogru8jm3uo4Sam4D0yfl4_Ynf5W6znnCyzEpCkvRlFiUx7eBMglwW9cT1NiWGw3VQwM1u8nMM6tLn5QBpf3w9CPXkPMaR3Daa5XlRA356vRh8gGSrY7EeImJz4MzoZ1Q9XKNvzKJUGS9nOCkyPuFWs_s3bSMaPwZ3g-SQ7cl5A8mmwY650cSov1B4KB-zgzv1dgrifuOMn9YUa4y5D7BKqGz6tm4fNe7FEEY44eSQ-y5_a5R8JDQHgONWjiKuGL0JR-4O3lWaW-GyHlomD9cNivlRJa4QO-h2VcEEiJz4jqwnaG4EMzPXbksNPSz1UK-kAitE0sJxxU1bb2KW-h3yjwutcAB2sGYgzKpraj6E3Lr4DKhZV3S_7vQuMBC4tYFmz-mbWWwFN4KOjcfvGfXvix5DbKMoMNwD0sqPt5JPLGc_rEBjhxGQaLh-y-vGBwA3AbWtUC6TrXId6dWB80UvsFCjUz3UH2GEFZP7MfXky7JP0SkhMhg8AQnLGCmxWNvm1o9wskVmjCyokd4mXtBVOBVg3gHTqEraX9ItOScwSlEc3p7gLCybtBt_w5BlZrOMQ73tdcLFBYqZADLvoWNEF88B2UPXmwgrR1nLO4Aj0GU5bNIL9nJw3YwOfWFSZHClQ_tJyBEgTGXx7flEiMlVPUqWdWAJ2qg0qfCiF9M5eqs-kHq2XSgB_RvcK6I65HP-vF6HYehxmID39L2oq27L-A6EW0ROSDCjWM4dC9Ift10CB-L7G0cPuxkT46InBabNSGp9xVbu5_pCpSpKthBqkj1IAXWpxrxxc_nxekUKnYLwg6mafp8T_b8sNI1AP0yz-TEqkGoPSqYnHtTtW_AdwbHL67x7mxI1L-Kftt9XMsfZKn-Ty5IJ089QYE-LCH5sxdvp_nKJgrtNM7mq5qpGPyQGuZ2MW088p0yBvp151NCOwVHaNH2AU_h74dH4to9Qf9XrvbcBemxPXvd2JRiF_mF0fRTROrndEsOU6z-hv6aG2C-iY7asvdNj1YM9k8nA6rwfCJ8wfrCkdctB9dUoPAzEZTJjCHGhqUS1n1FPqSqJH58W-xV0AtlnR3imXZqBFsb7iVs16HoF1oXlegkUruYXn1rb21YbmDxP3iYj6xw-rWh-kc848eMvCeXAhQn1SlCcIjJtWNGGTt7qHGmL3G31xP_G_MD9uDPziWClOQha_cIGjrQmeqYUkvC9d-oa4Eawp2-geLW1snTFFCUkZMpahmWx-0oC2weNPfncnKFlUGWURU1Iu2ad9fiI4n1v_roB9TNiDzTRhXYd4jJ1f3LVrDCYe-TCOgWb4JKzNV1GqH6gctukiL8wuTTaF37hle_M1WYC16dMv77jULaUMB4IdIOoRsBzoXMSZBO-4WGWBz7f0NcJHXCfl5TMFJWTbkwELzdn4TeMRu-u6dTlE9Ab_2n89sBjfsGB116L6mnblvHNcvTWSrKvTKAeN51FGqAlN4FhW3EF5qyU50MkezmDL9mFHFNJg_L4eYFrpKqJUdIcAkliKTKyqVX4gqtKkmWiPNehDiGn4LS22h0gkTBvEu_Jjl3OqAi8NU729TzYt_CrTWMVOv5hnXecFPb2ShLo27l5iVzWeLj1rj6zoXoPI6i_b4y_oYJUSI7-mLqUoXcMxR4w2ODIAoCtrSM0va0ZIlAdPRdy5PtF3NEVDpkAnhiY7pslJaIGB8LdtE2qOUoF-x21D_5JAgImtG0Xgr5W7fRSEuf_0XcODQqP-6I7e1ovTZmHMGUTBuExpW1oVmraGSaSkZBviGA-HwvQawebrL8vpQnibNmOeOG0JNcjqqN_3VirNFWFrtDfJ04uy1g-h_aqb5uspl3-OV1AaGfnZccfxCK3PyELHT75k2WC6E.sWxiwtDJL4UFsag7b0h-iw; _puid=user-xNrTC12791kT1SWbXXTbGvW5:1681664480-F3labgfmBrOUNQURT6gAxHsxuxRRoPgNT33zRtxzCmo%3D; intercom-session-dgkjq2bp=aU13VjBzV3VNUTJGTGFvQXJZazNsL2drSmVEMVB4cmp5Y3lZM1RIa0hWTHhFbjlCK3dLa0gyekpvT0xyVE5mTS0tdFRwWTVUcVRnR2t2OXhVMUg1RHFTZz09--2696f3887ce81ffb1bc8f5768bac73d02eaa171e; intercom-device-id-dgkjq2bp=06e4f926-f182-4068-a447-87f4f7291c85";
     static String authorization = "Bearer sk-fkTm6gFFvTuafl3fFf2476A94d994503B4304eEf42C0C16e";
 
-    static String authorization1106 = "Bearer sk-so9cwdnLGc48pZa3AaB147103bF94bC2A7271aA678DfF4B9";
+    static String authorization1106 = "Bearer sk-PT6c2L4CQsvSOpwtAaF5AeA4526d4f6c8a196dD9878dD398";
+    static String authorization1106_B = "Bearer sk-0BN87qyUC7yfYXkb74947b53A63d4b7fB94570271d92Ab20";
 
     static String url = "https://api.onechat.fun/backend-api/conversation";
     static String[] msgList =new String[]{"hello","say hello","how are you","what","when","what"};
@@ -180,19 +182,25 @@ public class GPTPlusUtil {
         }).toCompletableFuture().get();
     }
 
-    public static void sendMsg4Nine(boolean isN,String msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
-        String url = "https://api.onechat.fun/v1/chat/completions";
-        //String url1106 = "http://101.43.13.81:9092/v1/chat/completions";
-        String url1106 = "http://172.17.0.1:9092/v1/chat/completions";
+    public static void sendMsg4Nine(boolean isN, JSONObject obj, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
 
+        String url = "https://api.onechat.fun/v1/chat/completions";
+        String url1106 = "https://chatapi.onechat.fun/v1/chat/completions";
+        // String url1106 = "http://172.17.0.1:9092/v1/chat/completions";
+         String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
         if(isN){
+            obj.put("model","gpt-4-1106-preview");
             System.out.println("1106");
-            sendMsg4Util(msg,response,url1106,authorization1106);
+            String msg = JSONObject.toJSONString(obj);
+            // sendMsg4Util(msg,response,url1106,authorization1106);
+            sendMsg4Util(msg,response,url1106B,authorization1106_B);
+
+            System.out.printf(msg);
         }else {
             System.out.println("no1106");
+            String msg = JSONObject.toJSONString(obj);
             sendMsg4Util(msg,response,url,authorization);
         }
-
 
     }
 
@@ -220,6 +228,7 @@ public class GPTPlusUtil {
                 .addHeader(Header.CONTENT_TYPE.name(),"application/json")
                 .setReadTimeout(360000)
                 .setRequestTimeout(360000)
+                .setFollowRedirect(true)
 //                .addHeader("cookie",cookie)
 //                .addHeader("content-type","application/json")
 //                .addHeader("origin","https://chat.openai.com")
@@ -312,6 +321,10 @@ public class GPTPlusUtil {
             }
         }).toCompletableFuture().get();;
     }
+
+
+
+
 
 
 
