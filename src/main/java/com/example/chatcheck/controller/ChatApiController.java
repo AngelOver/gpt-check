@@ -181,15 +181,28 @@ public class ChatApiController {
             JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(msg));
             JSONArray messages = jsonObject.getJSONArray("messages");
             JSONArray newMsg = new JSONArray();
+            boolean isN1106 = true;//仅仅当模型文字小于500token，并最后一行小于500
+            boolean isN1106All = false;//当出现gpt时，一定调用1106
             int index = 0;
+            System.out.println(messages.size());
             for (Object message : messages) {
                 index = index+1;
+                JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
                 if(index==1){
-                    JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
+
                     if("system".equals(data.getString("role"))  ){
                         data.put("content", data.getString("content")+gpt4 );
                         newMsg.add(data);
                         continue;
+                    }
+                }
+                String content = data.getString("content");
+                if(content.contains("gpt")||content.contains("GPT")||content.contains("知识库")||content.contains("2023")){
+                    isN1106All=true;
+                }else{
+                    int length =  content.length();
+                    if(length>350){
+                        isN1106 = false;
                     }
                 }
 
@@ -197,9 +210,10 @@ public class ChatApiController {
             }
             System.out.println(JSONObject.toJSONString(newMsg.get(newMsg.size()-1)));
             jsonObject.put("messages", newMsg);
-            GPTPlusUtil.sendMsg4(JSONObject.toJSONString(jsonObject), response);
+            GPTPlusUtil.sendMsg4Nine(isN1106All?true:isN1106,JSONObject.toJSONString(jsonObject), response);
         } catch (Exception e)
         {
+
             System.out.println("error"+e.getMessage());
             response.getWriter().close();
         }
