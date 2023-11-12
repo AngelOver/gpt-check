@@ -1,27 +1,22 @@
 package com.example.chatcheck.util;
 
 import cn.hutool.http.ContentType;
-import cn.hutool.http.Header;
 import com.alibaba.fastjson.JSONObject;
+import com.example.chatcheck.util.stream.SseStreamListener_rep2;
 import com.example.chatcheck.util.stream.SseStreamListener;
-import io.netty.handler.codec.http.HttpHeaders;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;
-import org.asynchttpclient.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class GPTOKStreamUtil {
     static String authorization = "Bearer sk-fkTm6gFFvTuafl3fFf2476A94d994503B4304eEf42C0C16e";
@@ -40,28 +35,28 @@ public class GPTOKStreamUtil {
         return client.build();
     }
 
-    public static void main(String[] args) {
-        test();
-    }
-    public static String test(){
-        // 设置请求URL和参数
-        String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
-        String body = "{\"model\":\"gpt-4-1106-preview\",\"messages\":[{\"role\":\"system\",\"content\":\"You are a helpful assistant.\"},{\"role\":\"user\",\"content\":\"你好\"}],\"stream\":true}";
-        SseEmitter sseEmitter = new SseEmitter(-1L);
-        SseStreamListener listener = new SseStreamListener(sseEmitter);
-        EventSource.Factory factory = EventSources.createFactory(init());
-        okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(url1106B)
-                .post(RequestBody.create(MediaType.parse(ContentType.JSON.getValue()),
-                        body))
-                .header("Authorization", authorization1106_B)
-                .build();
-        factory.newEventSource(request, listener);
-        System.out.println("001");
-        // 发送请求并获取响应
-        // 打印响应结果
-        return null;
-    }
+//    public static void main(String[] args) {
+//        test();
+//    }
+//    public static String test(){
+//        // 设置请求URL和参数
+//        String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
+//        String body = "{\"model\":\"gpt-4-1106-preview\",\"messages\":[{\"role\":\"system\",\"content\":\"You are a helpful assistant.\"},{\"role\":\"user\",\"content\":\"你好\"}],\"stream\":true}";
+//        SseEmitter sseEmitter = new SseEmitter(-1L);
+//        SseStreamListener listener = new SseStreamListener(sseEmitter);
+//        EventSource.Factory factory = EventSources.createFactory(init());
+//        okhttp3.Request request = new okhttp3.Request.Builder()
+//                .url(url1106B)
+//                .post(RequestBody.create(MediaType.parse(ContentType.JSON.getValue()),
+//                        body))
+//                .header("Authorization", authorization1106_B)
+//                .build();
+//        factory.newEventSource(request, listener);
+//        System.out.println("001");
+//        // 发送请求并获取响应
+//        // 打印响应结果
+//        return null;
+//    }
 
     public static SseEmitter send(String msg){
         // 设置请求URL和参数
@@ -87,12 +82,52 @@ public class GPTOKStreamUtil {
         return sseEmitter;
     }
 
+    public static SseEmitter sendRes(String msg,HttpServletResponse response) throws InterruptedException {
+        // 设置请求URL和参数
+        String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
+        String body = msg;
+        SseEmitter sseEmitter = new SseEmitter(-1L);
+        SseStreamListener_rep2 listener = new SseStreamListener_rep2(sseEmitter);
+        listener.setResponse(response);
+        EventSource.Factory factory = EventSources.createFactory(init());
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url1106B)
+                .post(RequestBody.create(MediaType.parse(ContentType.JSON.getValue()),
+                        body))
+                .header("Authorization", authorization1106_B)
+                .build();
+        EventSource eventSource = factory.newEventSource(request, listener);
+        CountDownLatch latch = new CountDownLatch(1);  // 创建 CountDownLatch
+        listener.setOnComplate(data -> {
+            //回答完成，可以做一些事情
+            //回答完毕后关闭 SseEmitter
+            sseEmitter.complete(); // 关闭 SseEmitter
+            latch.countDown();
+        });
+
+        try {
+            latch.await(360,TimeUnit.SECONDS);   // 阻塞当前线程直到计数器归零
+        } catch (InterruptedException e) {
+            // handle exception
+        }finally {
+            try {
+                response.getWriter().close();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        // 发送请求并获取响应
+        // 打印响应结果
+        System.out.println("retrun");
+        return sseEmitter;
+    }
+
     public static SseEmitter send2(String msg){
         // 设置请求URL和参数
         String url = "https://api.onechat.fun/v1/chat/completions";
         String body = msg;
         SseEmitter sseEmitter = new SseEmitter(-1L);
-        SseStreamListener listener = new SseStreamListener(sseEmitter);
+        SseStreamListener_rep2 listener = new SseStreamListener_rep2(sseEmitter);
         EventSource.Factory factory = EventSources.createFactory(init());
         okhttp3.Request request = new okhttp3.Request.Builder()
                 .url(url)
@@ -124,7 +159,7 @@ public class GPTOKStreamUtil {
             obj.put("model","gpt-4-1106-preview");
             String msg = JSONObject.toJSONString(obj);
          //   System.out.printf(msg);
-            return send(msg);
+            return sendRes(msg,response);
         }else {
             System.out.println("no1106");
             String msg = JSONObject.toJSONString(obj);

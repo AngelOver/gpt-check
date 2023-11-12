@@ -8,33 +8,22 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.example.chatcheck.controller.dto.ChatMsg;
 import com.example.chatcheck.controller.dto.MsgApiOnlineDTO;
 import com.example.chatcheck.controller.dto.MsgUtil;
 import com.example.chatcheck.controller.dto.R;
 import com.example.chatcheck.util.GPTOKStreamUtil;
 import com.example.chatcheck.util.GPTPlusUtil;
-import com.example.chatcheck.util.stream.SseStreamListener;
-import io.github.furstenheim.CopyDown;
-import io.github.furstenheim.Options;
-import io.github.furstenheim.OptionsBuilder;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 设备列表对外接口，对其他模块
@@ -225,7 +214,7 @@ public class ChatApiController {
     }
 
     @PostMapping("/completions")
-    public SseEmitter see2(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
+    public void see2(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         try {
             response.setContentType("text/event-stream;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -271,14 +260,14 @@ public class ChatApiController {
             jsonObject.put("messages", newMsg);
            // System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
             boolean isN = isN1106All ? true : isN1106;
-            return GPTOKStreamUtil.sendMsg4Nine(isN,jsonObject, response);
+             GPTOKStreamUtil.sendMsg4Nine(isN,jsonObject, response);
         } catch (Exception e)
         {
 
             System.out.println("error"+e.getMessage());
             response.getWriter().close();
         }
-        return null;
+        //return null;
     }
 
 //    @GetMapping("/sse")

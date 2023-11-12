@@ -8,6 +8,8 @@ package com.example.chatcheck.util.stream;
 import cn.hutool.core.util.StrUtil;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import com.alibaba.fastjson.JSONObject;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
@@ -36,7 +38,7 @@ public abstract class AbstractStreamListener extends EventSourceListener {
     }
 
     public void onEvent(EventSource eventSource, String id, String type, String data) {
-
+        //System.out.println(data);
         this.onMsg(data);
         if (data.equals("[DONE]")) {
             onComplate.accept(lastMessage);
@@ -53,7 +55,11 @@ public abstract class AbstractStreamListener extends EventSourceListener {
                 if (Objects.nonNull(response)) {
                     responseText = response.body().string();
                 }
-
+                if(response.code()==200){
+                    this.onMsg(JSONObject.parseObject(responseText).toJSONString());
+                    onComplate.accept(lastMessage);
+                    return;
+                }
                 log.error("response：{}", responseText);
                 String forbiddenText = "Your access was terminated due to violation of our policies";
                 if (StrUtil.contains(responseText, forbiddenText)) {
@@ -71,6 +77,7 @@ public abstract class AbstractStreamListener extends EventSourceListener {
                 log.warn("onFailure error:{}", var11);
             } finally {
                 eventSource.cancel();
+                onComplate.accept(lastMessage);
             }
 
         } catch (Throwable var13) {
