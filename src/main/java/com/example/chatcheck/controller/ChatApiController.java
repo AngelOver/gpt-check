@@ -225,9 +225,10 @@ public class ChatApiController {
             boolean isN1106 = true;//仅仅当模型文字小于500token，并最后一行小于500
             boolean isN1106All = false;//当出现gpt时，一定调用1106
             int index = 0;
+            int allLength = 0;
             System.out.println(messages.size());
             if(messages.size()>6){
-                System.out.println("超长限制");
+                System.out.println("上下文超长限制");
                 JSONArray newMsgs = new JSONArray();
                 newMsgs.add(messages.get(0));
                 newMsgs.addAll(messages.subList(messages.size()-5,messages.size()));
@@ -249,6 +250,7 @@ public class ChatApiController {
                     isN1106All=true;
                 }else{
                     int length =  content.length();
+                    allLength+=length;
                     if(length>350){
                         isN1106 = false;
                     }
@@ -256,6 +258,16 @@ public class ChatApiController {
 
                 newMsg.add(message);
             }
+
+
+            if(allLength>2000&&newMsg.size()>4){
+                System.out.println("token超长限制");
+                JSONArray newMsgs2 = new JSONArray();
+                newMsgs2.add(newMsg.get(0));
+                newMsgs2.addAll(newMsg.subList(newMsg.size()-4,newMsg.size()));
+                newMsg = newMsgs2;
+            }
+
             System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(newMsg.get(newMsg.size()-1)));
             jsonObject.put("messages", newMsg);
            // System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
