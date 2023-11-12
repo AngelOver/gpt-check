@@ -261,10 +261,18 @@ public class ChatApiController {
 
 
             if(allLength>2000&&newMsg.size()>4){
-                System.out.println("token超长限制");
+                System.out.println("token超长限制2000");
                 JSONArray newMsgs2 = new JSONArray();
                 newMsgs2.add(newMsg.get(0));
                 newMsgs2.addAll(newMsg.subList(newMsg.size()-4,newMsg.size()));
+                newMsg = newMsgs2;
+            }
+
+            if(allLength>6000&&newMsg.size()>3){
+                System.out.println("token超长限制5000");
+                JSONArray newMsgs2 = new JSONArray();
+                newMsgs2.add(newMsg.get(0));
+                newMsgs2.addAll(newMsg.subList(newMsg.size()-2,newMsg.size()));
                 newMsg = newMsgs2;
             }
 
