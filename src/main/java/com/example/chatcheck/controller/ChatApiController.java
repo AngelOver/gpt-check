@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -214,8 +215,10 @@ public class ChatApiController {
     }
 
     @PostMapping("/completions")
-    public void see2(@RequestBody Object msg, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
+    public void see2(@RequestBody Object msg, HttpServletRequest request, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         try {
+            String authorization = request.getHeader("authorization");
+
             response.setContentType("text/event-stream;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
            // TimeInterval timer = DateUtil.timer();
@@ -245,6 +248,7 @@ public class ChatApiController {
                         continue;
                     }
                 }
+
                 String content = data.getString("content");
                 if(content.contains("gpt")||content.contains("GPT")||content.contains("知识库")||content.contains("2023")){
                     isN1106All=true;
@@ -280,7 +284,20 @@ public class ChatApiController {
             jsonObject.put("messages", newMsg);
            // System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
             boolean isN = isN1106All ? true : isN1106;
-             GPTOKStreamUtil.sendMsg4Nine(isN,jsonObject, response);
+
+            if(!authorization.contains("1chat")){
+               return;
+            }
+            if(authorization.contains("BLT")){
+                isN = true;
+            }
+            GPTOKStreamUtil.sendMsg4Nine(isN,jsonObject, response);
+            if(isN){
+                putRedis("ApiCount_"+DateUtil.today()+"_1106");
+            }else {
+                putRedis("ApiCount_"+DateUtil.today()+"_No1106");
+            }
+
         } catch (Exception e)
         {
 
@@ -290,6 +307,17 @@ public class ChatApiController {
         //return null;
     }
 
+
+        void  putRedis(String redisKey){
+            if(redisCacheService.hasKey(redisKey)){
+                String countStr =  (String) redisCacheService.get(redisKey);
+                Integer count = Integer.valueOf(countStr)+1;
+                redisCacheService.setNoDel(redisKey,count.toString());
+            }else{
+                redisCacheService.setNoDel(redisKey,"1");
+            }
+            System.out.println(redisKey+":"+redisCacheService.get(redisKey));
+        }
 //    @GetMapping("/sse")
 //    @CrossOrigin
 //    public SseEmitter sseEmitter(String prompt, HttpServletResponse response) {
