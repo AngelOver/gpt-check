@@ -229,17 +229,20 @@ public class ChatApiController {
             boolean isN1106All = false;//当出现gpt时，一定调用1106
             int index = 0;
             int allLength = 0;
+            int msgLength = 0;
             System.out.println(messages.size());
-            if(messages.size()>6){
+            if(messages.size()>5){
                 System.out.println("上下文超长限制");
-                JSONArray newMsgs = new JSONArray();
-                newMsgs.add(messages.get(0));
-                newMsgs.addAll(messages.subList(messages.size()-5,messages.size()));
-                messages = newMsgs;
+                messages = putNewMsg(messages,4);
             }
             for (Object message : messages) {
+
                 index = index+1;
                 JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
+                if(index == messages.size()){
+                    msgLength  =  String_length(data.getString("content"));
+                }
+
                 if(index==1){
 
                     if("system".equals(data.getString("role"))  ){
@@ -253,7 +256,7 @@ public class ChatApiController {
                 if(content.contains("gpt")||content.contains("GPT")||content.contains("知识库")||content.contains("2023")){
                     isN1106All=true;
                 }else{
-                    int length =  content.length();
+                    int length =  String_length(content);
                     allLength+=length;
                     if(length>350){
                         isN1106 = false;
@@ -262,26 +265,26 @@ public class ChatApiController {
 
                 newMsg.add(message);
             }
-
-
-            if(allLength>2000&&newMsg.size()>4){
-                System.out.println("token超长限制2000");
-                JSONArray newMsgs2 = new JSONArray();
-                newMsgs2.add(newMsg.get(0));
-                newMsgs2.addAll(newMsg.subList(newMsg.size()-4,newMsg.size()));
-                newMsg = newMsgs2;
+            messages = newMsg;
+            if(msgLength>3500){
+                System.out.println("单次长度超限3500");
+                messages = putNewMsg(messages,1);
+            }
+            if(msgLength>2000){
+                System.out.println("单次长度超限2000");
+                messages = putNewMsg(messages,2);
+            }
+            if(allLength>2000&&messages.size()>3){
+                System.out.println("token总超长限制2000");
+                messages = putNewMsg(messages,3);
+            }
+            if(allLength>4000&&messages.size()>2){
+                System.out.println("token超长限制4000");
+                messages = putNewMsg(messages,2);
             }
 
-            if(allLength>6000&&newMsg.size()>3){
-                System.out.println("token超长限制5000");
-                JSONArray newMsgs2 = new JSONArray();
-                newMsgs2.add(newMsg.get(0));
-                newMsgs2.addAll(newMsg.subList(newMsg.size()-2,newMsg.size()));
-                newMsg = newMsgs2;
-            }
-
-            System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(newMsg.get(newMsg.size()-1)));
-            jsonObject.put("messages", newMsg);
+            System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(messages.get(messages.size()-1)));
+            jsonObject.put("messages", messages);
            // System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
             boolean isN = isN1106All ? true : isN1106;
 
@@ -307,6 +310,29 @@ public class ChatApiController {
         //return null;
     }
 
+    private static int String_length(String value) {
+        int length = 0;
+        String chinese = "[\u4e00-\u9fa5]";
+        for (int i = 0; i < value.length(); i++) {
+            String temp = value.substring(i, i + 1);
+            if (temp.matches(chinese)) {
+                length += 2;
+            } else {
+                length += 1;
+            }
+        }
+        return length;
+    }
+    JSONArray  putNewMsg(JSONArray msg,int size){
+            JSONArray newMsg = new JSONArray();
+            if(msg.size()>size){
+                newMsg.add(msg.get(0));
+                newMsg.addAll(msg.subList(msg.size()-size,msg.size()));
+                return newMsg;
+            }else {
+                return msg;
+            }
+   }
 
         void  putRedis(String redisKey){
             if(redisCacheService.hasKey(redisKey)){
