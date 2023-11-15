@@ -257,8 +257,10 @@ public class GPTPlusUtil {
             @Override
             public State onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
                 //bytes.write(bodyPart.getBodyPartBytes());
-                //System.out.println("01");
+
                 String s = new String(bodyPart.getBodyPartBytes(), StandardCharsets.UTF_8);
+                // System.out.println("01");
+                // System.out.println(s);
                 if(index==0){
                     index =1;
                     if(s.contains("data:")){
@@ -320,6 +322,8 @@ public class GPTPlusUtil {
                 t.printStackTrace();
             }
         }).toCompletableFuture().get();;
+        client.isClosed();
+            client.close();
     }
 
 

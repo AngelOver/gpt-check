@@ -2,6 +2,7 @@ package com.example.chatcheck.util;
 
 import cn.hutool.http.ContentType;
 import com.alibaba.fastjson.JSONObject;
+import com.example.chatcheck.util.stream.SseStreamListener_api;
 import com.example.chatcheck.util.stream.SseStreamListener_rep2;
 import com.example.chatcheck.util.stream.SseStreamListener;
 import okhttp3.MediaType;
@@ -16,7 +17,6 @@ import java.io.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 public class GPTOKStreamUtil {
     static String authorization = "Bearer sk-fkTm6gFFvTuafl3fFf2476A94d994503B4304eEf42C0C16e";
@@ -82,9 +82,8 @@ public class GPTOKStreamUtil {
         return sseEmitter;
     }
 
-    public static SseEmitter sendRes(String msg,HttpServletResponse response) throws InterruptedException {
+    public static SseEmitter sendRes(String msg, HttpServletResponse response, String url1106B, String authorization1106_B) throws InterruptedException {
         // 设置请求URL和参数
-        String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
         String body = msg;
         SseEmitter sseEmitter = new SseEmitter(-1L);
         SseStreamListener_rep2 listener = new SseStreamListener_rep2(sseEmitter);
@@ -94,7 +93,7 @@ public class GPTOKStreamUtil {
                 .url(url1106B)
                 .post(RequestBody.create(MediaType.parse(ContentType.JSON.getValue()),
                         body))
-                .header("Authorization", authorization1106_B)
+                .header("Authorization",authorization1106_B )
                 .build();
         EventSource eventSource = factory.newEventSource(request, listener);
         CountDownLatch latch = new CountDownLatch(1);  // 创建 CountDownLatch
@@ -122,29 +121,46 @@ public class GPTOKStreamUtil {
         return sseEmitter;
     }
 
-    public static SseEmitter send2(String msg){
+
+    public static SseEmitter sendResQQ(String msg, HttpServletResponse response, String url1106B, String authorization1106_B) throws InterruptedException {
         // 设置请求URL和参数
-        String url = "https://api.onechat.fun/v1/chat/completions";
         String body = msg;
         SseEmitter sseEmitter = new SseEmitter(-1L);
-        SseStreamListener_rep2 listener = new SseStreamListener_rep2(sseEmitter);
+        SseStreamListener_api listener = new SseStreamListener_api(sseEmitter);
+        listener.setResponse(response);
         EventSource.Factory factory = EventSources.createFactory(init());
         okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(url)
+                .url(url1106B)
                 .post(RequestBody.create(MediaType.parse(ContentType.JSON.getValue()),
                         body))
-                .header("Authorization", authorization)
+                .header("Authorization",authorization1106_B )
                 .build();
-        factory.newEventSource(request, listener);
+        EventSource eventSource = factory.newEventSource(request, listener);
+        CountDownLatch latch = new CountDownLatch(1);  // 创建 CountDownLatch
         listener.setOnComplate(data -> {
             //回答完成，可以做一些事情
             //回答完毕后关闭 SseEmitter
             sseEmitter.complete(); // 关闭 SseEmitter
+            latch.countDown();
         });
+
+        try {
+            latch.await(360,TimeUnit.SECONDS);   // 阻塞当前线程直到计数器归零
+        } catch (InterruptedException e) {
+            // handle exception
+        }finally {
+            try {
+                response.getWriter().close();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
         // 发送请求并获取响应
         // 打印响应结果
+        System.out.println("retrun");
         return sseEmitter;
     }
+
 
 
 
@@ -159,11 +175,12 @@ public class GPTOKStreamUtil {
             obj.put("model","gpt-4-1106-preview");
             String msg = JSONObject.toJSONString(obj);
          //   System.out.printf(msg);
-            return sendRes(msg,response);
+            return sendRes(msg,response,url1106B,authorization1106_B);
         }else {
             System.out.println("no1106");
             String msg = JSONObject.toJSONString(obj);
-            GPTPlusUtil.sendMsg4Util(msg,response,url,authorization);
+            sendResQQ(msg,response,url,authorization);
+            // GPTPlusUtil.sendMsg4Util(msg,response,url,authorization);
             // send2(msg);
             return null;
         }
