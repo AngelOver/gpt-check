@@ -292,10 +292,10 @@ public class ChatApiController {
             if(!authorization.contains("1chat")){
                return;
             }
-            if(authorization.contains("BLT")){
+            if(authorization.contains("ALL")){
                 isN = true;
             }
-            GPTOKStreamUtil.sendMsg4Nine(isN,jsonObject, response);
+            GPTOKStreamUtil.sendMsg4Nine(isN,authorization,jsonObject, response);
             if(isN){
                 putRedis("ApiCount_"+DateUtil.today()+"_1106");
             }else {

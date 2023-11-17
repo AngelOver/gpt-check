@@ -24,6 +24,8 @@ public class GPTOKStreamUtil {
     static String authorization1106 = "Bearer sk-PT6c2L4CQsvSOpwtAaF5AeA4526d4f6c8a196dD9878dD398";
     static String authorization1106_B = "Bearer sk-0BN87qyUC7yfYXkb74947b53A63d4b7fB94570271d92Ab20";
 
+    static String authorization1106_L = "Bearer sk-FV9CkzcFqfrs782E4316850eC341450aBc7f267290F02507";
+
     private OkHttpClient okHttpClient;
     private long timeout = 90;
     public static OkHttpClient init() {
@@ -164,22 +166,30 @@ public class GPTOKStreamUtil {
 
 
 
-    public static SseEmitter sendMsg4Nine(boolean isN, JSONObject obj, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
+    public static SseEmitter sendMsg4Nine(boolean isN, String apiKey, JSONObject obj, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
 
         String url = "https://api.onechat.fun/v1/chat/completions";
         String url1106 = "https://chatapi.onechat.fun/v1/chat/completions";
+        String url1106L = "https://turboapi.chatify.me/v1/chat/completions";
         // String url1106 = "http://172.17.0.1:9092/v1/chat/completions";
         String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
         if(isN){
-            System.out.println("1106");
-            obj.put("model","gpt-4-1106-preview");
             String msg = JSONObject.toJSONString(obj);
          //   System.out.printf(msg);
-            return sendRes(msg,response,url1106B,authorization1106_B);
+            if(apiKey.contains("LIU")){
+                System.out.println("LIU1106");
+                return sendRes(msg,response,url1106L,authorization1106_L);
+            }else if(apiKey.contains("BLT")) {
+                System.out.println("BLT1106");
+                return sendRes(msg, response, url1106B, authorization1106_B);
+            }else {
+                System.out.println("LIU1106");
+                return sendRes(msg,response,url1106L,authorization1106_L);
+            }
         }else {
             System.out.println("no1106");
             String msg = JSONObject.toJSONString(obj);
-            sendResQQ(msg,response,url,authorization);
+            sendResQQ(msg,response,url, GPTOKStreamUtil.authorization);
             // GPTPlusUtil.sendMsg4Util(msg,response,url,authorization);
             // send2(msg);
             return null;
