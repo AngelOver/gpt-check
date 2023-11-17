@@ -173,8 +173,9 @@ public class GPTOKStreamUtil {
         String url1106L = "https://turboapi.chatify.me/v1/chat/completions";
         // String url1106 = "http://172.17.0.1:9092/v1/chat/completions";
         String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
+        obj.put("model","gpt-4-1106-preview");
         if(isN){
-            obj.put("model","gpt-4-1106-preview");
+
             String msg = JSONObject.toJSONString(obj);
            //   System.out.printf(msg);
             if(apiKey.contains("LIU")){
@@ -190,6 +191,14 @@ public class GPTOKStreamUtil {
         }else {
             System.out.println("no1106");
             String msg = JSONObject.toJSONString(obj);
+            if(apiKey.contains("2L")){
+                System.out.println("LIU1106");
+                return sendRes(msg,response,url1106L,authorization1106_L);
+            }
+            if(apiKey.contains("2B")){
+                System.out.println("BLT1106");
+                return sendRes(msg, response, url1106B, authorization1106_B);
+            }
             sendResQQ(msg,response,url, GPTOKStreamUtil.authorization);
             // GPTPlusUtil.sendMsg4Util(msg,response,url,authorization);
             // send2(msg);
