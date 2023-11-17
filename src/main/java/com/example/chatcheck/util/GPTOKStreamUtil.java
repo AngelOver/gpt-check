@@ -175,6 +175,7 @@ public class GPTOKStreamUtil {
         String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
         if(isN){
             String msg = JSONObject.toJSONString(obj);
+            obj.put("model","gpt-4-1106-preview");
          //   System.out.printf(msg);
             if(apiKey.contains("LIU")){
                 System.out.println("LIU1106");
