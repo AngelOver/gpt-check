@@ -174,10 +174,11 @@ public class GPTOKStreamUtil {
         // String url1106 = "http://172.17.0.1:9092/v1/chat/completions";
         String url1106B = "https://one-api.bltcy.top/v1/chat/completions";
         obj.put("model","gpt-4-1106-preview");
+        System.out.printf(apiKey);
         if(isN){
 
             String msg = JSONObject.toJSONString(obj);
-           //   System.out.printf(msg);
+             System.out.printf(msg);
             if(apiKey.contains("LIU")){
                 System.out.println("LIU1106");
                 return sendRes(msg,response,url1106L,authorization1106_L);
@@ -191,6 +192,7 @@ public class GPTOKStreamUtil {
         }else {
             System.out.println("no1106");
             String msg = JSONObject.toJSONString(obj);
+            System.out.printf(msg);
             if(apiKey.contains("2L")){
                 System.out.println("LIU1106");
                 return sendRes(msg,response,url1106L,authorization1106_L);
