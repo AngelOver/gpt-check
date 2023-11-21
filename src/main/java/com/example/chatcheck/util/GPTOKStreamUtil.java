@@ -194,11 +194,11 @@ public class GPTOKStreamUtil {
             String msg = JSONObject.toJSONString(obj);
             System.out.printf(msg);
             if(apiKey.contains("2L")){
-                System.out.println("LIU1106");
+                System.out.println("2L1106");
                 return sendRes(msg,response,url1106L,authorization1106_L);
             }
             if(apiKey.contains("2B")){
-                System.out.println("BLT1106");
+                System.out.println("2B1106");
                 return sendRes(msg, response, url1106B, authorization1106_B);
             }
             sendResQQ(msg,response,url, GPTOKStreamUtil.authorization);
