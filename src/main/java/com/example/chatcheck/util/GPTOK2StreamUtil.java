@@ -96,12 +96,8 @@ public class GPTOK2StreamUtil {
         obj.put("model","gpt-4-1106-preview");
         String msg = JSONObject.toJSONString(obj);
         System.out.printf(msg);
-        String[] client = ApiKeyCient.toType(apiKey);
-        if(isN){
-            return sendRes(msg,response,client[0],client[1]);
-        }else {
-            return sendRes(msg,response,client[0],client[1]);
-        }
+        String[] client = ApiKeyCient.toType(apiKey,isN);
+         return sendRes(msg,response,client[0],client[1]);
 
     }
 

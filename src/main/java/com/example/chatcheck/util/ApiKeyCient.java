@@ -15,7 +15,7 @@ public class ApiKeyCient {
     final static String url1106J = "http://154.12.87.114:3000/v1/chat/completions";
 
 
-    final  static String authorization1106_B = "Bearer sk-0BN87qyUC7yfYXkb74947b53A63d4b7fB94570271d92Ab20";
+    final static String authorization1106_B = "Bearer sk-0BN87qyUC7yfYXkb74947b53A63d4b7fB94570271d92Ab20";
     final static String authorization1106_L = "Bearer sk-FV9CkzcFqfrs782E4316850eC341450aBc7f267290F02507";
     final static String authorization1106_G = "Bearer sk-jWdUodjap88wnJlz3c7a23Db72924cBfAaF885124e92Ea16";
     final static String authorization1106_J = "Bearer sk-NMq42sYX30XmOIfcF9E13dAe4c0a4a6a9334908877552a99";
@@ -26,23 +26,31 @@ public class ApiKeyCient {
 
     String model;
 
-   public static String[] toType(String key){
-        if(key.contains("LIU")||key.contains("2L")){
-            System.out.println("2L1106");
-            return new String[]{url1106L,authorization1106_L};
-        }else if(key.contains("BLT")||key.contains("2B")) {
-            System.out.println("2B1106");
-            return new String[]{url1106B,authorization1106_B};
-        }else if(key.contains("JIE")||key.contains("2J")) {
+    public static String[] toType(String key, boolean isN) {
+        if (isN) {
+            System.out.println("is1106");
+            key = key.replaceAll("LIU", "").replaceAll("BLT", "").replaceAll("JIE", "").replaceAll("GAO", "");
+            //isN为true时，是短模型，强制1105
+        } else {
+            //isN为false时，是长模型，建议逆向
+            key = key.replaceAll("2L", "").replaceAll("2B", "").replaceAll("2J", "").replaceAll("2G", "");
+        }
+        if (key.contains("JIE") || key.contains("2J")) {
             System.out.println("2J1106");
-            return new String[]{url1106J,authorization1106_J};
-        }else {
+            return new String[]{url1106J, authorization1106_J};
+
+        } else if (key.contains("BLT") || key.contains("2B")) {
+            System.out.println("2B1106");
+            return new String[]{url1106B, authorization1106_B};
+        } else if (key.contains("GAO") || key.contains("2G")) {
             System.out.println("2G1106");
-            return new String[]{url1106G,authorization1106_G};
+            return new String[]{url1106G, authorization1106_G};
+        } else {
+            System.out.println("2L1106");
+            return new String[]{url1106L, authorization1106_L};
         }
 
     }
-
 
 
 }
