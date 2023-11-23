@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.chatcheck.controller.dto.MsgApiOnlineDTO;
 import com.example.chatcheck.controller.dto.MsgUtil;
 import com.example.chatcheck.controller.dto.R;
+import com.example.chatcheck.util.GPTOK2StreamUtil;
 import com.example.chatcheck.util.GPTOKStreamUtil;
 import com.example.chatcheck.util.GPTPlusUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,9 @@ public class ChatApiController {
 
 
     public static List<MsgDTO> MSGList = new ArrayList<>();
+
+    @Autowired
+    private  GPTOK2StreamUtil gptok2StreamUtil ;
 
 
     @GetMapping("/test")
@@ -219,7 +223,6 @@ public class ChatApiController {
     public void see2(@RequestBody Object msg, HttpServletRequest request, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         try {
             String authorization = request.getHeader("authorization");
-
             response.setContentType("text/event-stream;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
            // TimeInterval timer = DateUtil.timer();
@@ -237,22 +240,18 @@ public class ChatApiController {
                 messages = putNewMsg(messages,4);
             }
             for (Object message : messages) {
-
                 index = index+1;
                 JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
                 if(index == messages.size()){
                     msgLength  =  String_length(data.getString("content"));
                 }
-
                 if(index==1){
-
                     if("system".equals(data.getString("role"))  ){
                         data.put("content", data.getString("content")+gpt4 );
                         newMsg.add(data);
                         continue;
                     }
                 }
-
                 String content = data.getString("content");
                 if(content.contains("gpt")||content.contains("GPT")||content.contains("知识库")||content.contains("2023")){
                     isN1106All=true;
@@ -263,27 +262,25 @@ public class ChatApiController {
                         isN1106 = false;
                     }
                 }
-
                 newMsg.add(message);
             }
             messages = newMsg;
             if(msgLength>3500){
-                System.out.println("单次长度超限3500");
+                System.out.println("msg超限3500");
                 messages = putNewMsg(messages,1);
             }
             if(msgLength>2000){
-                System.out.println("单次长度超限2000");
+                System.out.println("msg超限2000");
                 messages = putNewMsg(messages,2);
             }
             if(allLength>2000&&messages.size()>3){
-                System.out.println("token总超长限制2000");
+                System.out.println("ALL限制2000");
                 messages = putNewMsg(messages,3);
             }
             if(allLength>4000&&messages.size()>2){
-                System.out.println("token超长限制4000");
+                System.out.println("ALL限制4000");
                 messages = putNewMsg(messages,2);
             }
-
             System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(messages.get(messages.size()-1)));
             jsonObject.put("messages", messages);
            // System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
@@ -295,13 +292,12 @@ public class ChatApiController {
             if(authorization.contains("ALL")){
                 isN = true;
             }
-            GPTOKStreamUtil.sendMsg4Nine(isN,authorization,jsonObject, response);
+            gptok2StreamUtil.sendMsg4Nine(isN,authorization,jsonObject, response);
             if(isN){
                 putRedis("ApiCount_"+DateUtil.today()+"_1106");
             }else {
                 putRedis("ApiCount_"+DateUtil.today()+"_No1106");
             }
-
         } catch (Exception e)
         {
 
