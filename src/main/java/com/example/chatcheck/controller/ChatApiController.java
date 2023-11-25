@@ -222,6 +222,7 @@ public class ChatApiController {
     @PostMapping("/completions")
     public void see2(@RequestBody Object msg, HttpServletRequest request, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         try {
+            TimeInterval timer = DateUtil.timer();
             String authorization = request.getHeader("authorization");
             response.setContentType("text/event-stream;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -283,7 +284,7 @@ public class ChatApiController {
             }
             System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(messages.get(messages.size()-1)));
             jsonObject.put("messages", messages);
-           // System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
+
             boolean isN = isN1106All ? true : isN1106;
 
             if(!authorization.contains("1chat")){
@@ -293,6 +294,7 @@ public class ChatApiController {
                 isN = true;
             }
             gptok2StreamUtil.sendMsg4Nine(isN,authorization,jsonObject, response);
+            System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
             if(isN){
                 putRedis("ApiCount_"+DateUtil.today()+"_1106");
             }else {

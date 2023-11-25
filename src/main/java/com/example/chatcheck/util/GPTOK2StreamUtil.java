@@ -1,5 +1,6 @@
 package com.example.chatcheck.util;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.ContentType;
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.MediaType;
@@ -88,14 +89,13 @@ public class GPTOK2StreamUtil {
         }
         // 发送请求并获取响应
         // 打印响应结果
-        System.out.println("return");
         return null;
     }
 
     public  SseEmitter sendMsg4Nine(boolean isN, String apiKey, JSONObject obj, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         obj.put("model","gpt-4-1106-preview");
         String msg = JSONObject.toJSONString(obj);
-        System.out.printf(msg);
+        System.out.println(DateUtil.now()+":"+msg);
         String[] client = ApiKeyCient.toType(apiKey,isN);
          return sendRes(msg,response,client[0],client[1]);
 
