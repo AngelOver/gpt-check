@@ -47,7 +47,7 @@ public class ApiKeyCient {
             return new String[]{url1106G, authorization1106_G};
         } else {
             System.out.println("2L1106");
-            return new String[]{url1106L, authorization1106_L};
+            return new String[]{url1106L, authorization1106_L,"gpt-4"};
         }
 
     }

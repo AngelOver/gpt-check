@@ -93,10 +93,15 @@ public class GPTOK2StreamUtil {
     }
 
     public  SseEmitter sendMsg4Nine(boolean isN, String apiKey, JSONObject obj, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
-        obj.put("model","gpt-4-1106-preview");
+
+        String[] client = ApiKeyCient.toType(apiKey,isN);
+        if(client.length>2){
+            obj.put("model","gpt-4");
+        }else {
+            obj.put("model","gpt-4-1106-preview");
+        }
         String msg = JSONObject.toJSONString(obj);
         System.out.println(DateUtil.now()+":"+msg);
-        String[] client = ApiKeyCient.toType(apiKey,isN);
          return sendRes(msg,response,client[0],client[1]);
 
     }
