@@ -22,7 +22,7 @@ public class ApiKeyCient {
     final static String authorization1106_L = "Bearer sk-FV9CkzcFqfrs782E4316850eC341450aBc7f267290F02507";
     final static String authorization1106_G = "Bearer sk-jWdUodjap88wnJlz3c7a23Db72924cBfAaF885124e92Ea16";
     final static String authorization1106_J = "Bearer sk-NMq42sYX30XmOIfcF9E13dAe4c0a4a6a9334908877552a99";
-    final static String authorization1106_D = "Bearer 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";
+    final static String authorization1106_D = "Bearer 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";
 
     final static String authorization1106_Z = "Bearer sk-WttdgDfLnXM0AKSgE196Cb66De9b4510Ae1f5a7e37DfD1B4";
 
