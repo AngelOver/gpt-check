@@ -13,11 +13,9 @@ import com.example.chatcheck.controller.dto.MsgApiOnlineDTO;
 import com.example.chatcheck.controller.dto.MsgUtil;
 import com.example.chatcheck.controller.dto.R;
 import com.example.chatcheck.util.GPTOK2StreamUtil;
-import com.example.chatcheck.util.GPTOKStreamUtil;
 import com.example.chatcheck.util.GPTPlusUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -219,8 +217,92 @@ public class ChatApiController {
         }
     }
 
+
+
+
     @PostMapping("/completions")
     public void see2(@RequestBody Object msg, HttpServletRequest request, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
+        try {
+            TimeInterval timer = DateUtil.timer();
+            String authorization = request.getHeader("authorization");
+            response.setContentType("text/event-stream;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            // TimeInterval timer = DateUtil.timer();
+            JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(msg));
+            JSONArray messages = jsonObject.getJSONArray("messages");
+            JSONArray newMsg = new JSONArray();
+            int index = 0;
+            int allLength = 0;
+            int msgLength = 0;
+            System.out.println(messages.size());
+            if(messages.size()>5){
+                System.out.println("上下文超长限制");
+                messages = putNewMsg(messages,4);
+            }
+            for (Object message : messages) {
+                index = index+1;
+                JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(message)) ;
+                if(index == messages.size()){
+                    msgLength  =  String_length(data.getString("content"));
+                }
+                if(index==1){
+                    if("system".equals(data.getString("role"))  ){
+                        data.put("content", data.getString("content")+gpt4 );
+                        newMsg.add(data);
+                        continue;
+                    }
+                }
+                String content = data.getString("content");
+                int length =  String_length(content);
+                allLength+=length;
+                newMsg.add(message);
+            }
+            messages = newMsg;
+            if(msgLength>3500){
+                System.out.println("msg超限3500");
+                messages = putNewMsg(messages,1);
+            }
+            if(msgLength>2000){
+                System.out.println("msg超限2000");
+                messages = putNewMsg(messages,2);
+            }
+            if(allLength>2000&&messages.size()>3){
+                System.out.println("ALL限制2000");
+                messages = putNewMsg(messages,3);
+            }
+            if(allLength>4000&&messages.size()>2){
+                System.out.println("ALL限制4000");
+                messages = putNewMsg(messages,2);
+            }
+            System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(messages.get(messages.size()-1)));
+            jsonObject.put("messages", messages);
+
+
+            if(!authorization.contains("1chat")){
+                return;
+            }
+//            if(authorization.contains("ALL")){
+//                isN = true;
+//            }
+            gptok2StreamUtil.sendMsg4Nine(true,authorization,jsonObject, response);
+            System.out.println("调用完成：耗时(s)：" + timer.intervalMs() * 1.0 / 1000);
+            putRedis("ApiCount_"+DateUtil.today()+"_1106");
+        } catch (Exception e)
+        {
+
+            System.out.println("error"+e.getMessage());
+            response.getWriter().close();
+        }
+        //return null;
+    }
+
+
+
+
+
+
+    @PostMapping("/completions_v2")
+    public void completions_v2(@RequestBody Object msg, HttpServletRequest request, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         try {
             TimeInterval timer = DateUtil.timer();
             String authorization = request.getHeader("authorization");

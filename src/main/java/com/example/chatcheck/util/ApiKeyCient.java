@@ -22,7 +22,7 @@ public class ApiKeyCient {
     final static String authorization1106_L = "Bearer sk-FV9CkzcFqfrs782E4316850eC341450aBc7f267290F02507";
     final static String authorization1106_G = "Bearer sk-jWdUodjap88wnJlz3c7a23Db72924cBfAaF885124e92Ea16";
     final static String authorization1106_J = "Bearer sk-NMq42sYX30XmOIfcF9E13dAe4c0a4a6a9334908877552a99";
-    final static String authorization1106_D = "Bearer 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";
+    final static String authorization1106_D = "Bearer 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";
 
     final static String authorization1106_Z = "Bearer sk-WttdgDfLnXM0AKSgE196Cb66De9b4510Ae1f5a7e37DfD1B4";
 
@@ -33,14 +33,14 @@ public class ApiKeyCient {
     String model;
 
     public static String[] toType(String key, boolean isN) {
-        if (isN) {
-            System.out.println("is1106");
-            key = key.replaceAll("LIU", "").replaceAll("ZER", "").replaceAll("DAW", "").replaceAll("BLT", "").replaceAll("JIE", "").replaceAll("GAO", "");
-            //isN为true时，是短模型，强制1105
-        } else {
-            //isN为false时，是长模型，建议逆向
-            key = key.replaceAll("2L", "").replaceAll("2Z", "").replaceAll("2D", "").replaceAll("2B", "").replaceAll("2J", "").replaceAll("2G", "");
-        }
+//        if (isN) {
+//            System.out.println("is1106");
+//            key = key.replaceAll("LIU", "").replaceAll("ZER", "").replaceAll("DAW", "").replaceAll("BLT", "").replaceAll("JIE", "").replaceAll("GAO", "");
+//            //isN为true时，是短模型，强制1105
+//        } else {
+//            //isN为false时，是长模型，建议逆向
+//            key = key.replaceAll("2L", "").replaceAll("2Z", "").replaceAll("2D", "").replaceAll("2B", "").replaceAll("2J", "").replaceAll("2G", "");
+//        }
         if (key.contains("JIE") || key.contains("2J")) {
             System.out.println("2J1106");
             return new String[]{url1106J, authorization1106_J};
