@@ -27,7 +27,7 @@ public class GPT3ClientUtil {
     };
     public static String test(String apiKey){
         // 设置请求URL和参数
-        String url = "http://chatapi2.a3r.top/v1/chat/completions";
+        String url = "https://chatapi2.a3r.top/v1/chat/completions";
 //        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 17892));
         // 设置请求头部信息
         HttpRequest request = HttpRequest.post(url)
