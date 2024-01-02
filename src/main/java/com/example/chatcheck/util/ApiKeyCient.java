@@ -20,8 +20,9 @@ public class ApiKeyCient {
 
     final static String url1106F = "https://ftddnaue.cloud.sealos.io/v1/chat/completions";
 
+    final static String url1106W = "https://vip.zzapi.life/v1/chat/completions";
 
-
+    final static String authorization1106_W = "Bearer sk-ZXWHbVXr6K6h92Dy47347aB0EaA843D5B75b018965Ce3138";
 
     final static String authorization1106_B = "Bearer sk-0BN87qyUC7yfYXkb74947b53A63d4b7fB94570271d92Ab20";
     final static String authorization1106_L = "Bearer sk-FV9CkzcFqfrs782E4316850eC341450aBc7f267290F02507";
@@ -55,7 +56,11 @@ public class ApiKeyCient {
         }  else if (key.contains("FTD") || key.contains("2F")) {
             System.out.println("2F1106");
             return new String[]{url1106F, authorization1106_F};
-        } else  if (key.contains("BLT") || key.contains("2B")) {
+        }  else if (key.contains("WF") || key.contains("2W")) {
+            System.out.println("2W1106");
+            return new String[]{url1106W, authorization1106_W};
+        }
+        else  if (key.contains("BLT") || key.contains("2B")) {
             System.out.println("2B1106");
             return new String[]{url1106B, authorization1106_B};
         }else if (key.contains("JIE") || key.contains("2J")) {
