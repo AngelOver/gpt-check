@@ -390,10 +390,7 @@ public class ChatApiController {
         }
         //return null;
     }
-
-
-
-    private static int String_length(String value) {
+    private static int String_length_old(String value) {
         int length = 0;
         String chinese = "[\u4e00-\u9fa5]";
         for (int i = 0; i < value.length(); i++) {
@@ -406,6 +403,34 @@ public class ChatApiController {
         }
         return length;
     }
+
+
+    private static int String_length(String value) {
+      return String_length_new(value);
+    }
+
+    private static int String_length_new(String value) {
+        //优化1：如果长度小于100，直接返回100
+        if(value.length()<100){
+            return 100;
+        }
+        //优化2：如果长度小于50，直接返回50
+        int length = 0;
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (isChinese(c)) {
+                length += 2;
+            } else {
+                length += 1;
+            }
+        }
+        return length;
+    }
+
+    private static boolean isChinese(char c) {
+        // 根据Unicode编码范围判断字符是否为中文
+        return c >= 0x4e00 && c <= 0x9fa5;
+    }
     JSONArray  putNewMsg(JSONArray msg,int size){
             JSONArray newMsg = new JSONArray();
             if(msg.size()>size){
@@ -416,6 +441,11 @@ public class ChatApiController {
                 return msg;
             }
    }
+
+    public static void main(String[] args) {
+        String str = "你好，我是小智，很高兴为您服务。你好，我是小智，很高兴为您服务。你好，我是小智，很高兴为您服务。你好，我是小智，很高兴为您服务。你，我是小智，我是小智，很高兴为您服务。你好，我是小智，很高兴为您服务。，很高兴为您服务。你好，我是小智，很高兴为您服务。好，我是小智，很高兴为您服务。";
+        System.out.println(String_length(str));
+    }
 
         void  putRedis(String redisKey){
             if(redisCacheService.hasKey(redisKey)){
