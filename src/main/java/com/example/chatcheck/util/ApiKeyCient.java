@@ -29,7 +29,7 @@ public class ApiKeyCient {
 
     final static String authorization1106_PLUS = "Bearer sk-aKpMvxGOBkcqs1ZCE3D3Fe04A48d4eE88fAeC7F2786a74E9";
 
-    final static String authorization1106_ALL = "Bearer sk-Y0dNIdwqOJdTXlgvFaC02fC1A4C845168aB328F9B05d1379";
+    final static String authorization1106_ALL = "Bearer sk-aKpMvxGOBkcqs1ZCE3D3Fe04A48d4eE88fAeC7F2786a74E9";
 
     final static String authorization1106_W = "Bearer sk-ZXWHbVXr6K6h92Dy47347aB0EaA843D5B75b018965Ce3138";
 
@@ -73,7 +73,7 @@ public class ApiKeyCient {
             return new String[]{url1106ALL, authorization1106_ALL,"gpt-4-all"};
         }
         else  if (key.contains("PLUS") || key.contains("2P")) {
-            System.out.println("2A-ALL");
+            System.out.println("2A-PLUS");
             return new String[]{url1106PLUS, authorization1106_PLUS,"gpt-4-plus"};
         }
         else  if (key.contains("BLT") || key.contains("2B")) {
