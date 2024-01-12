@@ -22,6 +22,15 @@ public class ApiKeyCient {
 
     final static String url1106W = "https://vip.zzapi.life/v1/chat/completions";
 
+    final static String url1106ALL = "https://api.a1r.cc/v1/chat/completions";
+
+    final static String url1106PLUS = "https://api.a1r.cc/v1/chat/completions";
+
+
+    final static String authorization1106_PLUS = "Bearer sk-aKpMvxGOBkcqs1ZCE3D3Fe04A48d4eE88fAeC7F2786a74E9";
+
+    final static String authorization1106_ALL = "Bearer sk-Y0dNIdwqOJdTXlgvFaC02fC1A4C845168aB328F9B05d1379";
+
     final static String authorization1106_W = "Bearer sk-ZXWHbVXr6K6h92Dy47347aB0EaA843D5B75b018965Ce3138";
 
     final static String authorization1106_B = "Bearer sk-0BN87qyUC7yfYXkb74947b53A63d4b7fB94570271d92Ab20";
@@ -59,6 +68,13 @@ public class ApiKeyCient {
         }  else if (key.contains("WF") || key.contains("2W")) {
             System.out.println("2W1106");
             return new String[]{url1106W, authorization1106_W};
+        }else  if (key.contains("ALL") || key.contains("2A")) {
+            System.out.println("2A-ALL");
+            return new String[]{url1106ALL, authorization1106_ALL,"gpt-4-all"};
+        }
+        else  if (key.contains("PLUS") || key.contains("2P")) {
+            System.out.println("2A-ALL");
+            return new String[]{url1106PLUS, authorization1106_PLUS,"gpt-4-plus"};
         }
         else  if (key.contains("BLT") || key.contains("2B")) {
             System.out.println("2B1106");

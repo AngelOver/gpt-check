@@ -96,7 +96,7 @@ public class GPTOK2StreamUtil {
 
         String[] client = ApiKeyCient.toType(apiKey,isN);
         if(client.length>2){
-            obj.put("model","gpt-4");
+            obj.put("model",client[2]);
         }else {
             obj.put("model","gpt-4-1106-preview");
         }
