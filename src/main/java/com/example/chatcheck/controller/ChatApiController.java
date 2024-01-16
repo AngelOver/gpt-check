@@ -288,7 +288,7 @@ public class ChatApiController {
                     data.put("content", msgS[0]);
                     m= data;
                 });
-                messages.getJSONObject(messages.size()-1).put("content",msgS[0]);
+                messages.getJSONObject(messages.size()-1).put("content",msgS[0].replace(gpt4,""));
                 ArrayList<JSONObject> jsonObjects = CollUtil.newArrayList(messages.getJSONObject(messages.size() - 1));
                 messages = new JSONArray();
                 messages.addAll(jsonObjects);
@@ -310,8 +310,8 @@ public class ChatApiController {
         {
 
             System.out.println("error"+e.getMessage());
-            response.getWriter().close();
         }
+        response.getWriter().close();
         //return null;
     }
 
