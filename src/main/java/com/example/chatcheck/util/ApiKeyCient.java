@@ -26,12 +26,15 @@ public class ApiKeyCient {
 
     final static String url1106PLUS = "https://api.a1r.cc/v1/chat/completions";
 
+    final static String url1106T = "https://fastan.a1r.cc/api/v1/chat/completions";
+    final static String authorization1106_T = "Bearer fastgpt-mLRgsrLsLkGP1JbVYH0CpZpS";
 
     final static String authorization1106_PLUS = "Bearer sk-aKpMvxGOBkcqs1ZCE3D3Fe04A48d4eE88fAeC7F2786a74E9";
 
     final static String authorization1106_ALL = "Bearer sk-aKpMvxGOBkcqs1ZCE3D3Fe04A48d4eE88fAeC7F2786a74E9";
 
     final static String authorization1106_W = "Bearer sk-ZXWHbVXr6K6h92Dy47347aB0EaA843D5B75b018965Ce3138";
+
 
     final static String authorization1106_B = "Bearer sk-0BN87qyUC7yfYXkb74947b53A63d4b7fB94570271d92Ab20";
     final static String authorization1106_L = "Bearer sk-FV9CkzcFqfrs782E4316850eC341450aBc7f267290F02507";
@@ -75,6 +78,10 @@ public class ApiKeyCient {
         else  if (key.contains("PLUS") || key.contains("2P")) {
             System.out.println("2A-PLUS");
             return new String[]{url1106PLUS, authorization1106_PLUS,"gpt-4-plus"};
+        }
+        else  if (key.contains("TAN") || key.contains("2T")) {
+            System.out.println("TAN");
+            return new String[]{url1106T, authorization1106_T};
         }
         else  if (key.contains("BLT") || key.contains("2B")) {
             System.out.println("2B1106");

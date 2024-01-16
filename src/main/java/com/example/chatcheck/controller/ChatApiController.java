@@ -274,6 +274,25 @@ public class ChatApiController {
                 System.out.println("ALL限制4000");
                 messages = putNewMsg(messages,2);
             }
+
+            if(authorization.contains("TAN")){
+                final String[] msgS = {""};
+                messages.forEach(m->{
+                    JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(m)) ;
+                    String content = data.getString("content");
+                    if(!data.getString("role").equals("user")){
+                        msgS[0] = msgS[0]+"Ai: " +content;
+                    }else {
+                        msgS[0] = msgS[0]+"user:" +content;
+                    }
+                    data.put("content", msgS[0]);
+                    m= data;
+                });
+                messages.getJSONObject(messages.size()-1).put("content",msgS[0]);
+                ArrayList<JSONObject> jsonObjects = CollUtil.newArrayList(messages.getJSONObject(messages.size() - 1));
+                messages = new JSONArray();
+                messages.addAll(jsonObjects);
+            }
             System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(messages.get(messages.size()-1)));
             jsonObject.put("messages", messages);
 
