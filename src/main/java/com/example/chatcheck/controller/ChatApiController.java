@@ -218,8 +218,6 @@ public class ChatApiController {
     }
 
 
-
-
     @PostMapping("/completions")
     public void see2(@RequestBody Object msg, HttpServletRequest request, HttpServletResponse response) throws ExecutionException, InterruptedException, IOException {
         try {
@@ -275,27 +273,8 @@ public class ChatApiController {
                 messages = putNewMsg(messages,2);
             }
 
-            if(authorization.contains("TAN")){
-                final String[] msgS = {""};
-                messages.forEach(m->{
-                    JSONObject data =JSONObject.parseObject(JSONObject.toJSONString(m)) ;
-                    String content = data.getString("content");
-                    if(!data.getString("role").equals("user")){
-                        msgS[0] = msgS[0]+"Ai: " +content;
-                    }else {
-                        msgS[0] = msgS[0]+"user:" +content;
-                    }
-                    data.put("content", msgS[0]);
-                    m= data;
-                });
-                messages.getJSONObject(messages.size()-1).put("content",msgS[0].replace(gpt4,""));
-                ArrayList<JSONObject> jsonObjects = CollUtil.newArrayList(messages.getJSONObject(messages.size() - 1));
-                messages = new JSONArray();
-                messages.addAll(jsonObjects);
-            }
             System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(messages.get(messages.size()-1)));
             jsonObject.put("messages", messages);
-
 
             if(!authorization.contains("1chat")){
                 return;
@@ -314,6 +293,9 @@ public class ChatApiController {
         response.getWriter().close();
         //return null;
     }
+
+
+
 
 
 
