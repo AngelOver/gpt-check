@@ -63,6 +63,10 @@ public class GPTOK2StreamUtil_tan {
                 try {
                     if(!data.equals("[DONE]")){
                         data= data.replace("\"id\":\"\"", "\"id\":\""+"chatcmpl-"+ RandomUtil.randomString(10)+"\"");
+                        data= data.replace("\"model\":\"\"", "\"model\":\""+"gpt-3.5-turbo-16k"+"\"");
+                        data= data.replace("\"object\":\"\"", "\"object\":\""+"chat.completion.chunk"+"\"");
+                        data= data.replace("\"created\":\"\"", "\"created\":"+  DateUtil.date().toTimestamp().getTime()/1000+"");
+
                     }
                     response.getWriter().write("data: " + data + "\n\n");
                     response.getWriter().flush();

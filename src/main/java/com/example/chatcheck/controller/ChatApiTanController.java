@@ -90,22 +90,7 @@ public class ChatApiTanController {
                 newMsg.add(message);
             }
             messages = newMsg;
-            if(msgLength>3500){
-                System.out.println("msg超限3500");
-                messages = putNewMsg(messages,1);
-            }
-            if(msgLength>2000){
-                System.out.println("msg超限2000");
-                messages = putNewMsg(messages,2);
-            }
-            if(allLength>2000&&messages.size()>3){
-                System.out.println("ALL限制2000");
-                messages = putNewMsg(messages,3);
-            }
-            if(allLength>4000&&messages.size()>2){
-                System.out.println("ALL限制4000");
-                messages = putNewMsg(messages,2);
-            }
+
             System.out.println(DateUtil.now()+":"+JSONObject.toJSONString(messages.get(messages.size()-1)));
             jsonObject.put("messages", messages);
 
