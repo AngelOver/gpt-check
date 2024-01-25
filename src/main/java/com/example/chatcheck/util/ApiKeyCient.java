@@ -24,12 +24,16 @@ public class ApiKeyCient {
 
     final static String url1106ALL = "https://api.a1r.cc/v1/chat/completions";
 
+    final static String url1106A1R= "https://api.a1r.cc/v1/chat/completions";
+
     final static String url1106PLUS = "https://api.a1r.cc/v1/chat/completions";
 
     final static String url1106T = "https://fastan.a1r.cc/api/v1/chat/completions";
     final static String authorization1106_T = "Bearer fastgpt-mLRgsrLsLkGP1JbVYH0CpZpS";
 
     final static String authorization1106_PLUS = "Bearer sk-aKpMvxGOBkcqs1ZCE3D3Fe04A48d4eE88fAeC7F2786a74E9";
+
+    final static String authorization1106_A1R = "Bearer sk-Mu1eLEbji1w5eVNO7b11547815Fb4f53884bAdF6C1D12591";
 
     final static String authorization1106_ALL = "Bearer sk-aKpMvxGOBkcqs1ZCE3D3Fe04A48d4eE88fAeC7F2786a74E9";
 
@@ -62,7 +66,10 @@ public class ApiKeyCient {
 //            key = key.replaceAll("2L", "").replaceAll("2Z", "").replaceAll("2D", "").replaceAll("2B", "").replaceAll("2J", "").replaceAll("2G", "");
 //        }
 
-        if (key.contains("ZER") || key.contains("2Z")) {
+        if (key.contains("A1R") || key.contains("A1R")) {
+            System.out.println("2A-A1R");
+            return new String[]{url1106A1R, authorization1106_A1R};
+        } else if (key.contains("ZER") || key.contains("2Z")) {
             System.out.println("2Z1106");
             return new String[]{url1106Z, authorization1106_Z};
         }  else if (key.contains("FTD") || key.contains("2F")) {
@@ -71,7 +78,8 @@ public class ApiKeyCient {
         }  else if (key.contains("WF") || key.contains("2W")) {
             System.out.println("2W1106");
             return new String[]{url1106W, authorization1106_W};
-        }else  if (key.contains("ALL") || key.contains("2A")) {
+        }
+        else  if (key.contains("ALL") || key.contains("2A")) {
             System.out.println("2A-ALL");
             return new String[]{url1106ALL, authorization1106_ALL,"gpt-4-all"};
         }
