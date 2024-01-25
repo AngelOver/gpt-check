@@ -415,6 +415,9 @@ public class ChatApiController {
         if(value.length()<100){
             return 100;
         }
+        if(value.length()>3500){
+            return 4100;
+        }
         //优化2：如果长度小于50，直接返回50
         int length = 0;
         for (int i = 0; i < value.length(); i++) {
