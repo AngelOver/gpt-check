@@ -98,7 +98,7 @@ public class GPTOK2StreamUtil {
         if(client.length>2){
             obj.put("model",client[2]);
         }else {
-            obj.put("model","gpt-4-0125-preview");
+            obj.put("model","gpt-4-1106-preview");
         }
         String msg = JSONObject.toJSONString(obj);
         System.out.println(DateUtil.now()+":"+msg);
