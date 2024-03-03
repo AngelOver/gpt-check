@@ -256,6 +256,8 @@ public class ChatApiController {
                 newMsg.add(message);
             }
             messages = newMsg;
+            // 暂时移除限制
+
             if(msgLength>3500){
                 System.out.println("msg超限3500");
                 messages = putNewMsg(messages,1);
@@ -264,10 +266,19 @@ public class ChatApiController {
                 System.out.println("msg超限2000");
                 messages = putNewMsg(messages,2);
             }
-            if(allLength>2000&&messages.size()>3){
-                System.out.println("ALL限制2000");
-                messages = putNewMsg(messages,3);
-            }
+
+//            if(msgLength>3500){
+//                System.out.println("msg超限3500");
+//                messages = putNewMsg(messages,1);
+//            }
+//            if(msgLength>2000){
+//                System.out.println("msg超限2000");
+//                messages = putNewMsg(messages,2);
+//            }
+//            if(allLength>2000&&messages.size()>3){
+//                System.out.println("ALL限制2000");
+//                messages = putNewMsg(messages,3);
+//            }
             if(allLength>4000&&messages.size()>2){
                 System.out.println("ALL限制4000");
                 messages = putNewMsg(messages,2);
@@ -411,9 +422,13 @@ public class ChatApiController {
     }
 
     private static int String_length_new(String value) {
+
         //优化1：如果长度小于100，直接返回100
         if(value.length()<100){
             return 100;
+        }
+        if(true){
+            return value.length();
         }
         if(value.length()>3500){
             return 4100;
