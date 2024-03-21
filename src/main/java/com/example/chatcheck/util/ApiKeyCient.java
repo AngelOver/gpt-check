@@ -22,11 +22,11 @@ public class ApiKeyCient {
 
     final static String url1106W = "https://vip.zzapi.life/v1/chat/completions";
 
-    final static String url1106ALL = "https://api.a1r.cc/v1/chat/completions";
+    final static String url1106ALL = "http://86.38.218.194:9091/v1/chat/completions";
 
-    final static String url1106A1R= "https://api.a1r.cc/v1/chat/completions";
+    final static String url1106A1R= "http://86.38.218.194:9091/v1/chat/completions";
 
-    final static String url1106PLUS = "https://api.a1r.cc/v1/chat/completions";
+    final static String url1106PLUS = "http://86.38.218.194:9091/v1/chat/completions";
 
     final static String url1106T = "https://fastan.a1r.cc/api/v1/chat/completions";
     final static String authorization1106_T = "Bearer fastgpt-mLRgsrLsLkGP1JbVYH0CpZpS";
@@ -50,6 +50,8 @@ public class ApiKeyCient {
 
     final static String authorization1106_F = "Bearer sk-v2Vqwzg6Sd77AR6zEeA0F059477c48C6AaAc5c0099615fFe";
 
+    final static String[] A1rArr = {url1106A1R, authorization1106_A1R};
+
     String apiKey;
 
     String apiURL;
@@ -68,7 +70,7 @@ public class ApiKeyCient {
 
         if (key.contains("A1R") || key.contains("A1R")) {
             System.out.println("2A-A1R");
-            return new String[]{url1106A1R, authorization1106_A1R};
+            return A1rArr;
         } else if (key.contains("ZER") || key.contains("2Z")) {
             System.out.println("2Z1106");
             return new String[]{url1106Z, authorization1106_Z};

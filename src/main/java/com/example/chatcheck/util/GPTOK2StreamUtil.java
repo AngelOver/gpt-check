@@ -34,7 +34,7 @@ public class GPTOK2StreamUtil {
         return client.build();
     }
 
-    public SseEmitter sendRes(String msg, HttpServletResponse response, String url1106B, String authorization1106_B) throws InterruptedException, IOException {
+    public SseEmitter sendRes(String msg, HttpServletResponse response, String url1106B, String authorization1106_B) throws  IOException {
         // 设置请求URL和参数
         String body = msg;
         EventSource.Factory factory = EventSources.createFactory(init());
